@@ -59,7 +59,6 @@ body::before{
   html.is-mobile #rotateHint{display:block}
 }
 
-/* TELAS */
 .screen{
   position:fixed;inset:0;display:flex;flex-direction:column;
   align-items:center;justify-content:center;z-index:2000;
@@ -128,12 +127,10 @@ body::before{
 .stat-card .num{font-size:28px;font-weight:900;color:var(--gold);text-shadow:0 2px 10px rgba(255,213,74,.3)}
 .stat-card .lbl{font-size:10px;opacity:.6;text-transform:uppercase;letter-spacing:1px;margin-top:3px}
 
-/* JOGO */
 #gameScreen{position:relative;height:100%;width:100%;display:none}
 #gameScreen.show{display:block}
 #app{display:grid;grid-template-rows:auto auto minmax(0,1fr) auto auto;height:100%;width:100%}
 
-/* HUD */
 #hud{
   display:flex;align-items:flex-start;justify-content:space-between;
   padding:7px 12px;gap:10px;
@@ -158,8 +155,7 @@ body::before{
 .score-box .score{font-size:22px;font-weight:900;color:var(--gold);text-shadow:0 2px 8px rgba(0,0,0,.7);line-height:1.1}
 .score-box .round-preview{
   font-size:10px;font-weight:700;color:#8dffb0;margin-top:2px;
-  min-height:12px;letter-spacing:.3px;
-  transition:color .3s;
+  min-height:12px;letter-spacing:.3px;transition:color .3s;
 }
 .score-box .round-preview.neg{color:#ff8a80}
 .score-box .round-preview.empty{opacity:0}
@@ -458,11 +454,7 @@ button.danger{background:linear-gradient(180deg,#ef5350,#b71c1c);border-color:#f
 ===================================================== */
 const IS_MOBILE = document.documentElement.classList.contains('is-mobile');
 const IS_IOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-const IS_ANDROID = /Android/.test(navigator.userAgent);
 
-/* =====================================================
-   BLOQUEIO DE ORIENTAÇÃO
-===================================================== */
 let orientationAttempted = false;
 async function tryLockOrientation(){
   if (orientationAttempted || !IS_MOBILE) return;
@@ -471,10 +463,8 @@ async function tryLockOrientation(){
     const el = document.documentElement;
     if (el.requestFullscreen) await el.requestFullscreen().catch(()=>{});
     else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
-    if (screen.orientation && typeof screen.orientation.lock === 'function') {
-      await screen.orientation.lock('landscape');
-    } else if (screen.lockOrientation) screen.lockOrientation('landscape');
-    else if (screen.mozLockOrientation) screen.mozLockOrientation('landscape');
+    if (screen.orientation && typeof screen.orientation.lock === 'function') await screen.orientation.lock('landscape');
+    else if (screen.lockOrientation) screen.lockOrientation('landscape');
   } catch(e) {}
 }
 function onFirstInteraction(){ if(IS_MOBILE) tryLockOrientation(); }
@@ -618,7 +608,7 @@ function newGame(mode){
     mortoTaken: { A:false, B:false },
     players: {}, turnOrder: [], turnIndex: 0,
     phase: 'draw', round: 1, selected: new Set(),
-    busy: false, mode, target: settings.target
+    busy: false, busySince: 0, mode, target: settings.target
   };
 
   if(mode === '4p'){
@@ -647,6 +637,7 @@ function startRound(first){
   G.turnIndex = 0;
   G.phase = 'draw';
   G.busy = false;
+  G.busySince = 0;
 
   for(const k in G.players){
     const p = G.players[k];
@@ -687,15 +678,13 @@ function validateMeld(p, cards){
   if(!cards.length) return { ok:false, msg:'Selecione cartas para melar.' };
   const wilds = cards.filter(c=>c.wild);
   const nats = cards.filter(c=>!c.wild);
-  if(!nats.length) return { ok:false, msg:'Uma sequência precisa de cartas naturais (2 e Joker são curingas).' };
+  if(!nats.length) return { ok:false, msg:'Uma sequência precisa de cartas naturais.' };
   const suit = nats[0].suit;
-  if(nats.some(c=>c.suit !== suit)) return { ok:false, msg:'Todas as cartas naturais devem ser do mesmo naipe.' };
+  if(nats.some(c=>c.suit !== suit)) return { ok:false, msg:'Todas as naturais devem ser do mesmo naipe.' };
 
   const sorted = nats.slice().sort((a,b)=>RANK_ORDER[a.rank] - RANK_ORDER[b.rank]);
   for(let i=1;i<sorted.length;i++){
-    if(RANK_ORDER[sorted[i].rank] <= RANK_ORDER[sorted[i-1].rank]){
-      return { ok:false, msg:'As cartas devem formar uma sequência em ordem crescente.' };
-    }
+    if(RANK_ORDER[sorted[i].rank] <= RANK_ORDER[sorted[i-1].rank]) return { ok:false, msg:'Sequência em ordem crescente.' };
   }
 
   const existing = p.melds.find(m=>m.suit === suit);
@@ -703,14 +692,14 @@ function validateMeld(p, cards){
   const totalWild = wilds.length + (existing ? existing.wildCount : 0);
   const totalCards = totalNat + totalWild;
 
-  if(totalCards < 3) return { ok:false, msg:'Uma sequência precisa de pelo menos 3 cartas.' };
-  if(totalWild > 2) return { ok:false, msg:'Máximo de 2 curingas por sequência.' };
-  if(totalWild > totalNat) return { ok:false, msg:'Curingas não podem exceder as cartas naturais.' };
+  if(totalCards < 3) return { ok:false, msg:'Mínimo 3 cartas.' };
+  if(totalWild > 2) return { ok:false, msg:'Máx 2 curingas.' };
+  if(totalWild > totalNat) return { ok:false, msg:'Curingas > naturais.' };
 
   const ranks = sorted.map(c=>RANK_ORDER[c.rank]);
   let gaps = 0;
   for(let i=1;i<ranks.length;i++) gaps += ranks[i] - ranks[i-1] - 1;
-  if(gaps > totalWild) return { ok:false, msg:'Curingas insuficientes para preencher a sequência.' };
+  if(gaps > totalWild) return { ok:false, msg:'Curingas insuficientes.' };
 
   return { ok:true, suit, wilds, nats };
 }
@@ -742,24 +731,15 @@ function getMeldPoints(p){
   }
   return total;
 }
-function getHandPoints(p){
-  return p.hand.reduce((s,c)=>s + c.value, 0);
-}
-function getRoundPreview(p){
-  return getMeldPoints(p) - getHandPoints(p);
-}
+function getHandPoints(p){ return p.hand.reduce((s,c)=>s + c.value, 0); }
 function getTeamScore(team){
   let total = 0;
-  for(const k in G.players){
-    if(G.players[k].team === team) total += G.players[k].score;
-  }
+  for(const k in G.players) if(G.players[k].team === team) total += G.players[k].score;
   return total;
 }
 function getTeamMeldPoints(team){
   let total = 0;
-  for(const k in G.players){
-    if(G.players[k].team === team) total += getMeldPoints(G.players[k]);
-  }
+  for(const k in G.players) if(G.players[k].team === team) total += getMeldPoints(G.players[k]);
   return total;
 }
 
@@ -851,11 +831,7 @@ function discardCard(p, card){
 function humanDraw(){
   if(!isHumanTurn() || G.phase !== 'draw' || G.busy) return;
   if(!G.stock.length){
-    // ✅ FIX: só encerra se também não puder pegar o lixo
-    if(canTakeDiscard(G.players.human)){
-      toast('O monte acabou. Pegue o lixo para continuar!', true);
-      return;
-    }
+    if(canTakeDiscard(G.players.human)){ toast('O monte acabou. Pegue o lixo!', true); return; }
     endRound(null, 'O monte acabou e ninguém pode pegar o lixo!');
     return;
   }
@@ -870,11 +846,7 @@ function humanDraw(){
 function humanTakeDiscard(){
   if(!isHumanTurn() || G.phase !== 'draw' || G.busy) return;
   const p = G.players.human;
-  if(!canTakeDiscard(p)){
-    sfxError();
-    toast('A carta do topo não serve para nenhum jogo seu.', true);
-    return;
-  }
+  if(!canTakeDiscard(p)){ sfxError(); toast('A carta do topo não serve.', true); return; }
   G.busy = true;
   doTakeDiscard(p);
   G.phase = 'action';
@@ -897,7 +869,7 @@ function humanDiscard(){
   if(!isHumanTurn() || G.phase !== 'action' || G.busy) return;
   const p = G.players.human;
   const sel = p.hand.filter(c => G.selected.has(c.id));
-  if(sel.length !== 1){ sfxError(); toast('Selecione exatamente 1 carta para descartar.', true); return; }
+  if(sel.length !== 1){ sfxError(); toast('Selecione exatamente 1 carta.', true); return; }
 
   const card = sel[0];
   const willEmpty = (p.hand.length === 1);
@@ -905,35 +877,24 @@ function humanDiscard(){
   const mortoPego = G.mortoTaken[p.team];
   const canWin = hasCanastraLimpa && mortoPego;
 
-  // ✅ FIX: bloqueia descarte final só se houver outras jogadas
   if(willEmpty && !canWin){
     const hasOtherMoves = G.stock.length > 0 || canTakeDiscard(p);
     if(hasOtherMoves){
       sfxError();
-      if(!hasCanastraLimpa && !mortoPego) toast('Você precisa de CANASTRA LIMPA e do MORTO para bater!', true);
-      else if(!hasCanastraLimpa) toast('Você precisa de uma CANASTRA LIMPA para bater!', true);
-      else toast('Você precisa pegar o MORTO antes de bater!', true);
+      if(!hasCanastraLimpa) toast('Precisa de CANASTRA LIMPA para bater!', true);
+      else toast('Precisa do MORTO para bater!', true);
       return;
     }
-    // Sem outras jogadas — descarte forçado
-    toast('Sem mais jogadas — descartando sua última carta.', true);
+    toast('Sem mais jogadas — descarte forçado.', true);
   }
 
   discardCard(p, card);
   G.selected.clear();
 
   if(p.hand.length === 0){
-    if(!G.mortoTaken[p.team]){
-      takeMorto(p);
-      render();
-      endTurn();
-      return;
-    }
-    if(canWin){
-      endRound(p.team, 'Você bateu! 🎉');
-    } else {
-      endRound(null, 'Você ficou sem cartas sem bater.');
-    }
+    if(!G.mortoTaken[p.team]){ takeMorto(p); render(); endTurn(); return; }
+    if(canWin) endRound(p.team, 'Você bateu! 🎉');
+    else endRound(null, 'Você ficou sem cartas sem bater.');
     return;
   }
 
@@ -954,8 +915,14 @@ function takeMorto(p){
 }
 
 /* =====================================================
-   TURNO DOS BOTS
+   TURNO DOS BOTS — REESCRITO
 ===================================================== */
+
+function setBusy(val){
+  G.busy = val;
+  G.busySince = val ? Date.now() : 0;
+}
+
 function endTurn(){
   G.turnIndex = (G.turnIndex + 1) % G.turnOrder.length;
   G.phase = 'draw';
@@ -965,115 +932,149 @@ function endTurn(){
   const current = G.turnOrder[G.turnIndex];
   const currentPlayer = G.players[current];
 
-  // ✅ FIX: encerra rodada se próximo não pode agir (monte vazio + não pode pegar lixo)
   if(!G.stock.length && !canTakeDiscard(currentPlayer)){
     endRound(null, 'O monte acabou!');
     return;
   }
 
-  if(current !== 'human' && !G.busy) setTimeout(() => botTurn(current), 550);
+  if(current !== 'human' && !G.busy) setTimeout(() => botTurnSafe(current), 350);
+}
+
+/**
+ * Envolve botTurn em try/catch para garantir que G.busy nunca fique travado.
+ */
+async function botTurnSafe(playerId){
+  if(!G || G.phase === 'end') return;
+  if(G.busy){
+    // Se está ocupado há muito tempo, recupera
+    if(G.busySince && Date.now() - G.busySince > 4000){
+      console.warn('[Canastra] Recuperando de estado travado');
+      setBusy(false);
+    } else {
+      return;
+    }
+  }
+  setBusy(true);
+  try {
+    await botTurn(playerId);
+  } catch(e){
+    console.error('[Canastra] Erro no turno do bot:', e);
+    // Fallback: descarta uma carta e passa vez
+    try {
+      const p = G.players[playerId];
+      if(p && p.hand.length > 0 && G.phase !== 'end'){
+        discardCard(p, p.hand[0]);
+        render();
+      }
+    } catch(e2){ console.error('[Canastra] Fallback falhou:', e2); }
+    setBusy(false);
+    if(G.phase !== 'end'){
+      try { endTurn(); } catch(e3){ console.error(e3); }
+    }
+  }
 }
 
 async function botTurn(playerId){
-  if(G.busy) return;
-  G.busy = true;
   const p = G.players[playerId];
-  render();
-  await sleep(450);
+  if(!p) { setBusy(false); return; }
 
-  // ✅ FIX: encerra se não pode comprar nem pegar lixo
+  render();
+  await sleep(250);
+
+  // === 1. COMPRAR ===
   if(!G.stock.length && !canTakeDiscard(p)){
-    G.busy = false;
+    setBusy(false);
     endRound(null, 'O monte acabou!');
     return;
   }
 
-  if(canTakeDiscard(p) && G.discard.length >= 2){
+  if(canTakeDiscard(p) && G.discard.length >= 1){
     doTakeDiscard(p);
     toast(getPlayerName(p) + ' pegou o lixo!');
     render();
-    await sleep(650);
+    await sleep(300);
   } else if(G.stock.length > 0){
     drawFromStock(p, Math.min(2, G.stock.length));
     render();
-    await sleep(500);
+    await sleep(300);
   } else {
-    G.busy = false;
+    setBusy(false);
     endRound(null, 'O monte acabou!');
     return;
   }
 
-  const plan = botPlanMelds(p);
+  // === 2. MELAR ===
+  let plan = [];
+  try {
+    plan = botPlanMelds(p);
+  } catch(e){
+    console.error('[Canastra] botPlanMelds falhou:', e);
+    plan = [];
+  }
+
   for(const pl of plan){
+    if(G.phase === 'end') return;
     commitMeld(p, pl.cards, pl.suit, true);
     render();
-    await sleep(350);
+    await sleep(150);
   }
   if(plan.length){
     p.hasMelded = true;
     sfxMeld();
-    await sleep(300);
+    await sleep(150);
   }
 
-  if(!p.hand.length){
-    G.busy = false;
-    if(!G.mortoTaken[p.team]){
+  // === 3. VERIFICA SE ESVAZIOU (raro, mas possível) ===
+  if(p.hand.length === 0){
+    if(!G.mortoTaken[p.team] && G.mortos.length > 0){
       takeMorto(p);
       render();
-      await sleep(300);
-      G.busy = false;
-      endTurn();
-    } else {
-      endRound(null, getPlayerName(p) + ' ficou sem cartas.');
+      await sleep(250);
     }
-    return;
+    if(p.hand.length === 0){
+      // Não conseguiu pegar morto e está vazio — encerra
+      setBusy(false);
+      endRound(null, getPlayerName(p) + ' ficou sem cartas.');
+      return;
+    }
   }
 
+  // === 4. DESCARTAR ===
   const hasCanastraLimpa = p.melds.some(m => m.canastra && m.wildCount === 0);
   const mortoPego = G.mortoTaken[p.team];
   const canWin = hasCanastraLimpa && mortoPego;
   const willEmpty = (p.hand.length === 1);
 
   let card;
-  if(willEmpty && canWin){
-    card = p.hand[0]; // Vitória
-  } else if(willEmpty && !canWin && mortoPego){
-    // Bot não pode vencer e morto já foi — força descarte
-    const hasOtherMoves = G.stock.length > 0 || canTakeDiscard(p);
-    if(hasOtherMoves){
-      // Ainda há jogadas — bot deve tentar usar outra estratégia
-      // Como só tem 1 carta, força descarte mesmo assim
-      card = botChooseDiscard(p);
-    } else {
-      card = botChooseDiscard(p);
-    }
-  } else {
+  try {
     card = botChooseDiscard(p);
+  } catch(e){
+    card = p.hand[0];
+  }
+  if(!card) card = p.hand[0];
+
+  if(card){
+    discardCard(p, card);
+    render();
+    await sleep(300);
   }
 
-  discardCard(p, card);
-  render();
-  await sleep(450);
-
-  // Pega morto se esvaziou
-  if(p.hand.length === 0 && !G.mortoTaken[p.team]){
+  // === 5. PEGA MORTO SE ESVAZIOU ===
+  if(p.hand.length === 0 && !G.mortoTaken[p.team] && G.mortos.length > 0){
     takeMorto(p);
     render();
-    await sleep(350);
+    await sleep(250);
   }
 
-  // ✅ FIX: só declara vitória se realmente venceu
+  // === 6. VERIFICA VITÓRIA / FIM ===
   if(p.hand.length === 0){
-    G.busy = false;
-    if(canWin){
-      endRound(p.team, getPlayerName(p) + ' bateu!');
-    } else {
-      endRound(null, getPlayerName(p) + ' ficou sem cartas.');
-    }
+    setBusy(false);
+    if(canWin) endRound(p.team, getPlayerName(p) + ' bateu! 🏆');
+    else endRound(null, getPlayerName(p) + ' ficou sem cartas.');
     return;
   }
 
-  G.busy = false;
+  setBusy(false);
   endTurn();
 }
 
@@ -1085,69 +1086,140 @@ function getPlayerName(p){
   return 'CPU';
 }
 
+/**
+ * Planeja melds SEM SOBREPOSIÇÃO de cartas.
+ * Usa Set de IDs para garantir que cada carta apareça em apenas 1 meld.
+ */
 function botPlanMelds(p){
-  let hand = p.hand.slice();
   const plan = [];
+  const usedIds = new Set();
+
+  // Separar por naipe
   const bySuit = {};
   const wilds = [];
-  for(const c of hand){
+  for(const c of p.hand){
     if(c.wild) wilds.push(c);
     else (bySuit[c.suit] = bySuit[c.suit] || []).push(c);
   }
 
+  // === FASE 1: sequências naturais 3+ ===
   for(const suit in bySuit){
     const cards = bySuit[suit].sort((a,b)=>RANK_ORDER[a.rank] - RANK_ORDER[b.rank]);
-    if(cards.length >= 3){
-      let run = [cards[0]];
-      for(let i=1;i<cards.length;i++){
-        if(RANK_ORDER[cards[i].rank] === RANK_ORDER[cards[i-1].rank] + 1){
-          run.push(cards[i]);
-        } else {
-          if(run.length >= 3){
-            plan.push({ suit, cards: run.slice() });
-            hand = hand.filter(c => !run.some(x => x.id === c.id));
-          }
-          run = [cards[i]];
-        }
-      }
+    let run = [];
+    const flushRun = () => {
       if(run.length >= 3){
         plan.push({ suit, cards: run.slice() });
-        hand = hand.filter(c => !run.some(x => x.id === c.id));
+        for(const c of run) usedIds.add(c.id);
+      }
+      run = [];
+    };
+    for(const card of cards){
+      if(usedIds.has(card.id)) continue;
+      if(run.length === 0){
+        run.push(card);
+      } else if(RANK_ORDER[card.rank] === RANK_ORDER[run[run.length-1].rank] + 1){
+        run.push(card);
+      } else {
+        flushRun();
+        run.push(card);
+      }
+    }
+    flushRun();
+  }
+
+  // === FASE 2: usar curingas para completar pares ===
+  let wildIdx = 0;
+  for(const suit in bySuit){
+    if(wildIdx >= wilds.length) break;
+    const cards = bySuit[suit]
+      .filter(c => !usedIds.has(c.id))
+      .sort((a,b)=>RANK_ORDER[a.rank] - RANK_ORDER[b.rank]);
+    for(let i=0;i<cards.length-1 && wildIdx < wilds.length;i++){
+      if(usedIds.has(cards[i].id) || usedIds.has(cards[i+1].id)) continue;
+      const test = [cards[i], cards[i+1], wilds[wildIdx]];
+      if(validateMeld(p, test).ok){
+        plan.push({ suit, cards: test });
+        for(const c of test) usedIds.add(c.id);
+        wildIdx++;
       }
     }
   }
 
-  let wi = 0;
-  for(const suit in bySuit){
-    const cards = bySuit[suit].filter(c => !c.wild).sort((a,b)=>RANK_ORDER[a.rank] - RANK_ORDER[b.rank]);
-    for(let i=0;i<cards.length-1;i++){
-      if(wi < wilds.length && plan.length < 4){
-        const test = [cards[i], cards[i+1], wilds[wi]];
-        if(validateMeld(p, test).ok){
-          plan.push({ suit, cards: test });
-          hand = hand.filter(c => !test.some(x => x.id === c.id));
-          wi++;
-        }
+  // === FASE 3: extensões em melds existentes ===
+  for(const meld of p.melds){
+    if(usedIds.size >= p.hand.length) break;
+    const sameSuit = p.hand.filter(c => !c.wild && c.suit === meld.suit && !usedIds.has(c.id));
+    for(const card of sameSuit){
+      const test = [card];
+      if(validateMeld(p, test).ok){
+        plan.push({ suit: meld.suit, cards: test });
+        usedIds.add(card.id);
       }
     }
   }
+
   return plan;
 }
 
+/**
+ * Escolha de descarte inteligente:
+ * - Penaliza cartas que formam pares potenciais
+ * - Penaliza cartas do mesmo naipe que melds existentes
+ * - Prefere descartar cartas isoladas e de alto valor
+ * - Nunca descarta curingas (a não ser que só tenha eles)
+ */
 function botChooseDiscard(p){
+  if(p.hand.length === 0) return null;
+  if(p.hand.length === 1) return p.hand[0];
+
   const counts = {};
-  for(const c of p.hand){ if(!c.wild) counts[c.rank] = (counts[c.rank]||0)+1; }
-  let best = null, bestScore = Infinity;
+  const suitCounts = {};
   for(const c of p.hand){
-    let s;
-    if(c.wild) s = 500;
-    else {
-      const n = counts[c.rank] || 1;
-      s = (n - 1) * 40 - c.value * 0.6;
-      if(p.melds.some(m => m.suit === c.suit)) s += 200;
+    if(!c.wild){
+      counts[c.rank] = (counts[c.rank] || 0) + 1;
+      suitCounts[c.suit] = (suitCounts[c.suit] || 0) + 1;
     }
-    if(s < bestScore){ bestScore = s; best = c; }
   }
+
+  let best = null, bestScore = -Infinity;
+  for(const c of p.hand){
+    let score = 0;
+
+    if(c.wild){
+      // Curingas são muito valiosos, nunca descartar
+      score = -1000;
+    } else {
+      // Bônus por estar isolado (bom para descartar)
+      const rankCount = counts[c.rank] || 1;
+      score += (5 - rankCount) * 10; // quanto mais isolado, melhor descartar
+
+      // Bônus por naipe com poucas cartas (bom descartar)
+      const suitCount = suitCounts[c.suit] || 1;
+      score += (8 - suitCount) * 5;
+
+      // Penalidade se há meld do mesmo naipe (pode estender)
+      if(p.melds.some(m => m.suit === c.suit)) score -= 100;
+
+      // Penalidade por alto valor (perder pontos se pegar de volta)
+      score -= c.value * 0.5;
+
+      // Penalidade se forma par com carta adjacente (potencial sequência)
+      const hasAdjacent = p.hand.some(o =>
+        o.id !== c.id && !o.wild && o.suit === c.suit &&
+        Math.abs(RANK_ORDER[o.rank] - RANK_ORDER[c.rank]) === 1
+      );
+      if(hasAdjacent) score -= 30;
+
+      // Bônus se for carta alta isolada
+      if(rankCount === 1 && suitCount === 1) score += 20;
+    }
+
+    if(score > bestScore){
+      bestScore = score;
+      best = c;
+    }
+  }
+
   return best || p.hand[0];
 }
 
@@ -1157,7 +1229,7 @@ function botChooseDiscard(p){
 function endRound(winningTeam, reason){
   if(G.phase === 'end') return;
   G.phase = 'end';
-  G.busy = true;
+  setBusy(true);
 
   const results = {};
   const roundScores = { A: 0, B: 0 };
@@ -1174,7 +1246,7 @@ function endRound(winningTeam, reason){
 
     results[k] = { name: getPlayerName(p), meldPts, canPts, handPts, outBonus, mortoPenalty, total, team: p.team };
     roundScores[p.team] += total;
-    p.score += total;  // ✅ Acumula no placar do jogador
+    p.score += total;
   }
 
   stats.games++;
@@ -1191,7 +1263,6 @@ function endRound(winningTeam, reason){
 }
 
 function showRoundModal(res, roundScores, winningTeam, reason){
-  // ✅ FIX: usar pontuação ACUMULADA para decidir fim de jogo
   const totalA = getTeamScore('A');
   const totalB = getTeamScore('B');
   const isGameOver = totalA >= G.target || totalB >= G.target;
@@ -1291,25 +1362,20 @@ function render(){
   $('roundInfo').textContent = 'Rodada ' + G.round;
   $('targetInfo').textContent = 'Meta: ' + G.target + ' pontos';
 
-  // ✅ Preview de pontos em tempo real
   const previewA = getTeamMeldPoints('A');
   const previewB = getTeamMeldPoints('B');
 
   const hPreview = $('humanRoundPreview');
   hPreview.textContent = previewA > 0 ? '+' + previewA + ' pts' : '—';
   hPreview.classList.toggle('empty', previewA === 0);
-  hPreview.classList.remove('neg');
 
   const cPreview = $('cpuRoundPreview');
   cPreview.textContent = previewB > 0 ? '+' + previewB + ' pts' : '—';
   cPreview.classList.toggle('empty', previewB === 0);
-  cPreview.classList.remove('neg');
 
-  // ✅ Progresso em direção à meta (do jogador A)
   const progress = Math.max(0, Math.min(100, (totalA / G.target) * 100));
   $('progressFill').style.width = progress + '%';
 
-  // ✅ Indicador de líder
   $('humanBox').classList.toggle('leading', totalA > totalB && G.round > 1);
   $('cpuBox').classList.toggle('leading', totalB > totalA && G.round > 1);
   $('humanBox').classList.toggle('active', isHumanTurn());
@@ -1336,12 +1402,15 @@ function renderHands(){
   const ch = $('cpuHand');
   ch.innerHTML = '';
   const botKey = G.mode === '4p' ? 'opp1' : 'cpu';
-  G.players[botKey].hand.forEach((c, i) => {
-    const el = document.createElement('div');
-    el.className = 'card back';
-    el.style.zIndex = i;
-    ch.appendChild(el);
-  });
+  const botP = G.players[botKey];
+  if(botP){
+    botP.hand.forEach((c, i) => {
+      const el = document.createElement('div');
+      el.className = 'card back';
+      el.style.zIndex = i;
+      ch.appendChild(el);
+    });
+  }
 }
 
 function renderMelds(){
@@ -1428,16 +1497,10 @@ function updateStatus(){
   } else {
     const hasCanastraLimpa = p.melds.some(m => m.canastra && m.wildCount === 0);
     const mortoPego = G.mortoTaken[p.team];
-    if(hasCanastraLimpa && mortoPego){
-      el.textContent = '✓ Pronto para bater! Descarte sua última carta.';
-      el.classList.add('good');
-    } else if(hasCanastraLimpa){
-      el.textContent = 'Falta o MORTO para bater!';
-    } else if(mortoPego){
-      el.textContent = 'Falta uma CANASTRA LIMPA para bater!';
-    } else {
-      el.textContent = 'Selecione cartas para melar ou 1 para descartar';
-    }
+    if(hasCanastraLimpa && mortoPego){ el.textContent = '✓ Pronto para bater!'; el.classList.add('good'); }
+    else if(hasCanastraLimpa) el.textContent = 'Falta o MORTO para bater!';
+    else if(mortoPego) el.textContent = 'Falta CANASTRA LIMPA para bater!';
+    else el.textContent = 'Selecione cartas para melar ou 1 para descartar';
   }
 }
 
@@ -1469,6 +1532,24 @@ function layoutHand(){
   }
   el.style.setProperty('--ov', ov + 'px');
 }
+
+/* =====================================================
+   WATCHDOG — recupera de travamentos
+===================================================== */
+setInterval(() => {
+  if(!G || G.phase === 'end' || !G.busy) return;
+  if(!G.busySince) return;
+  const elapsed = Date.now() - G.busySince;
+  if(elapsed > 6000){
+    console.warn('[Canastra Watchdog] Estado travado há ' + elapsed + 'ms — recuperando');
+    setBusy(false);
+    render();
+    if(!isHumanTurn() && G.phase !== 'end'){
+      const current = G.turnOrder[G.turnIndex];
+      try { endTurn(); } catch(e){ console.error(e); }
+    }
+  }
+}, 1000);
 
 /* =====================================================
    NAVEGAÇÃO
