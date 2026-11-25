@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>Canastra_MS</title>
 <script>
-/* Detecção de plataforma ANTES da renderização (evita flash de layout errado) */
 (function(){
   const ua = navigator.userAgent || '';
   const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
@@ -17,14 +16,12 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 :root{
-  /* vmin garante tamanho consistente entre portrait e landscape no mesmo aparelho */
   --cw: clamp(30px, 10vmin, 64px);
   --ch: calc(var(--cw) * 1.42);
   --gold:#ffd54a;
+  --gold-dark:#e6a400;
   --felt1:#0e5c2f;
   --felt2:#063318;
-  --wood:#3e2723;
-  --wood-light:#5d4037;
 }
 html,body{height:100%}
 body{
@@ -38,76 +35,38 @@ body::before{
     radial-gradient(circle at 20% 15%, rgba(255,255,255,.08), transparent 45%),
     radial-gradient(circle at 80% 85%, rgba(255,255,255,.06), transparent 45%);
 }
-body::after{
-  content:'';position:fixed;inset:0;pointer-events:none;
-  background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.02'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-  opacity:.4;
-}
 
-/* =====================================================
-   WRAPPER PRINCIPAL — permite rotação em mobile portrait
-===================================================== */
-#gameWrapper{
-  position: fixed;
-  inset: 0;
-  overflow: hidden;
-}
+#gameWrapper{position:fixed;inset:0;overflow:hidden}
 
-/* Rotação automática no celular quando em portrait */
 @media (orientation: portrait) and (max-width: 700px){
   html.is-mobile #gameWrapper{
-    top: 0; left: 0; right: auto; bottom: auto;
-    width: 100vh;          /* fallback */
-    width: 100dvh;
-    height: 100vw;         /* fallback */
-    height: 100dvw;
+    top:0; left:0; right:auto; bottom:auto;
+    width: 100dvh; height: 100dvw;
     transform-origin: 0 0;
-    /* Rotaciona 90° CW + posiciona no canto correto para preencher o viewport */
     transform: translate(100vw, 0) rotate(90deg);
   }
 }
 
-/* Hint de rotação (visível apenas em mobile portrait) */
 #rotateHint{
-  display: none;
-  position: fixed;
-  top: 14px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: rgba(255, 213, 74, 0.95);
-  color: #1a1a1a;
-  padding: 10px 20px;
-  border-radius: 24px;
-  font-weight: 800;
-  font-size: 13px;
-  letter-spacing: .3px;
-  z-index: 10000;
-  box-shadow: 0 6px 24px rgba(0,0,0,.55);
-  animation: hintPulse 2s infinite;
-  pointer-events: none;
-  white-space: nowrap;
-  font-family: 'Segoe UI', system-ui, sans-serif;
+  display:none;position:fixed;top:14px;left:50%;transform:translateX(-50%);
+  background:rgba(255,213,74,.95);color:#1a1a1a;padding:10px 20px;border-radius:24px;
+  font-weight:800;font-size:13px;letter-spacing:.3px;z-index:10000;
+  box-shadow:0 6px 24px rgba(0,0,0,.55);animation:hintPulse 2s infinite;
+  pointer-events:none;white-space:nowrap;font-family:'Segoe UI',system-ui,sans-serif;
 }
-@keyframes hintPulse{
-  0%, 100% { transform: translateX(-50%) scale(1); }
-  50% { transform: translateX(-50%) scale(1.05); }
-}
+@keyframes hintPulse{0%,100%{transform:translateX(-50%) scale(1)}50%{transform:translateX(-50%) scale(1.05)}}
 @media (orientation: portrait) and (max-width: 700px){
-  html.is-mobile #rotateHint{ display: block; }
+  html.is-mobile #rotateHint{display:block}
 }
 
-/* =====================================================
-   TELAS (menus, settings, stats)
-===================================================== */
+/* TELAS */
 .screen{
   position:fixed;inset:0;display:flex;flex-direction:column;
   align-items:center;justify-content:center;z-index:2000;
   background:rgba(0,0,0,.78);backdrop-filter:blur(12px);
-  opacity:0;pointer-events:none;transition:opacity .35s;
-  padding:20px;
+  opacity:0;pointer-events:none;transition:opacity .35s;padding:20px;
 }
 .screen.show{opacity:1;pointer-events:auto}
-
 #menuScreen .menu-box{
   background:linear-gradient(160deg,#1b4a2a,#0a2414);
   border:1px solid rgba(255,213,74,.4);border-radius:24px;
@@ -117,8 +76,7 @@ body::after{
 }
 #menuScreen .menu-box::before{
   content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;
-  background:radial-gradient(circle,rgba(255,213,74,.06),transparent 60%);
-  pointer-events:none;
+  background:radial-gradient(circle,rgba(255,213,74,.06),transparent 60%);pointer-events:none;
 }
 #menuScreen h1{
   font-size:clamp(26px,7vw,38px);letter-spacing:2px;
@@ -143,24 +101,18 @@ body::after{
   background:linear-gradient(160deg,#1b4a2a,#0a2414);
   border:1px solid rgba(255,213,74,.4);border-radius:22px;
   padding:30px 26px;max-width:460px;width:100%;
-  box-shadow:0 30px 90px rgba(0,0,0,.9);
-  max-height:92vh;overflow-y:auto;
+  box-shadow:0 30px 90px rgba(0,0,0,.9);max-height:92vh;overflow-y:auto;
 }
-.settings-box h2, .stats-box h2{
-  font-size:21px;color:var(--gold);margin-bottom:20px;letter-spacing:1px;
-}
+.settings-box h2, .stats-box h2{font-size:21px;color:var(--gold);margin-bottom:20px;letter-spacing:1px}
 .setting-row{
   display:flex;align-items:center;justify-content:space-between;
-  padding:13px 0;border-bottom:1px solid rgba(255,255,255,.08);
-  font-size:14px;gap:12px;
+  padding:13px 0;border-bottom:1px solid rgba(255,255,255,.08);font-size:14px;gap:12px;
 }
 .setting-row label{opacity:.85;flex:1}
 .setting-row select{
   background:rgba(0,0,0,.45);color:#fff;border:1px solid rgba(255,255,255,.2);
-  border-radius:8px;padding:9px 12px;font-size:13px;font-family:inherit;
-  min-width:110px;
+  border-radius:8px;padding:9px 12px;font-size:13px;font-family:inherit;min-width:110px;
 }
-.setting-row select:focus{outline:1px solid var(--gold)}
 .theme-dots{display:flex;gap:10px}
 .theme-dot{
   width:30px;height:30px;border-radius:50%;cursor:pointer;
@@ -171,44 +123,59 @@ body::after{
 .theme-dot[data-theme="green"]{background:linear-gradient(135deg,#1d7a45,#0a3a1e)}
 .theme-dot[data-theme="dark"]{background:linear-gradient(135deg,#1a1a2e,#16213e)}
 .theme-dot[data-theme="light"]{background:linear-gradient(135deg,#2e7d32,#1b5e20)}
-
 .stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px}
-.stat-card{
-  background:rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.1);
-  border-radius:14px;padding:16px 10px;text-align:center;
-}
+.stat-card{background:rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:16px 10px;text-align:center}
 .stat-card .num{font-size:28px;font-weight:900;color:var(--gold);text-shadow:0 2px 10px rgba(255,213,74,.3)}
 .stat-card .lbl{font-size:10px;opacity:.6;text-transform:uppercase;letter-spacing:1px;margin-top:3px}
 
-/* =====================================================
-   JOGO
-===================================================== */
+/* JOGO */
 #gameScreen{position:relative;height:100%;width:100%;display:none}
 #gameScreen.show{display:block}
+#app{display:grid;grid-template-rows:auto auto minmax(0,1fr) auto auto;height:100%;width:100%}
 
-#app{
-  display:grid;grid-template-rows:auto auto minmax(0,1fr) auto auto;
-  height:100%;width:100%;
-}
-
+/* HUD */
 #hud{
-  display:flex;align-items:center;justify-content:space-between;
+  display:flex;align-items:flex-start;justify-content:space-between;
   padding:7px 12px;gap:10px;
   background:linear-gradient(180deg,rgba(0,0,0,.6),rgba(0,0,0,.2));
   backdrop-filter:blur(8px);border-bottom:1px solid rgba(255,255,255,.1);
   z-index:50;
 }
 .score-box{
-  display:flex;flex-direction:column;align-items:center;min-width:78px;
+  display:flex;flex-direction:column;align-items:center;min-width:90px;
   padding:4px 14px;border-radius:12px;background:rgba(0,0,0,.35);
-  border:1px solid rgba(255,255,255,.12);transition:box-shadow .3s;
+  border:1px solid rgba(255,255,255,.12);
+  transition:box-shadow .3s,transform .3s;
+  position:relative;
 }
 .score-box.active{box-shadow:0 0 0 2px var(--gold),0 0 22px rgba(255,213,74,.6)}
+.score-box.leading{border-color:var(--gold)}
+.score-box.leading::before{
+  content:'👑';position:absolute;top:-10px;left:50%;transform:translateX(-50%);
+  font-size:16px;filter:drop-shadow(0 2px 4px rgba(0,0,0,.8));
+}
 .score-box .label{font-size:10px;letter-spacing:1.8px;text-transform:uppercase;opacity:.8}
-.score-box .score{font-size:21px;font-weight:900;color:var(--gold);text-shadow:0 2px 8px rgba(0,0,0,.7)}
-.center-hud{text-align:center;flex:1}
+.score-box .score{font-size:22px;font-weight:900;color:var(--gold);text-shadow:0 2px 8px rgba(0,0,0,.7);line-height:1.1}
+.score-box .round-preview{
+  font-size:10px;font-weight:700;color:#8dffb0;margin-top:2px;
+  min-height:12px;letter-spacing:.3px;
+  transition:color .3s;
+}
+.score-box .round-preview.neg{color:#ff8a80}
+.score-box .round-preview.empty{opacity:0}
+
+.center-hud{text-align:center;flex:1;min-width:0;padding-top:2px}
 #roundInfo{font-size:13px;letter-spacing:1.8px;text-transform:uppercase;opacity:.85;font-weight:600}
 #targetInfo{font-size:10px;opacity:.55;margin-top:1px}
+.progress-track{
+  height:5px;background:rgba(0,0,0,.4);border-radius:3px;
+  margin-top:6px;overflow:hidden;box-shadow:inset 0 1px 2px rgba(0,0,0,.5);
+}
+.progress-fill{
+  height:100%;background:linear-gradient(90deg,#ffcf3f,#ffe082);
+  border-radius:3px;transition:width .6s cubic-bezier(.2,.9,.3,1);
+  box-shadow:0 0 8px rgba(255,213,74,.8);
+}
 
 section{min-height:0;display:flex;flex-direction:column;justify-content:center;padding:2px 8px}
 .meld-row{
@@ -221,9 +188,7 @@ section{min-height:0;display:flex;flex-direction:column;justify-content:center;p
 .meld{position:relative;flex:0 0 auto;animation:popIn .35s cubic-bezier(.2,1.4,.4,1)}
 .meld-cards{--cw:clamp(22px,8vmin,36px);display:flex}
 .meld-cards .card:not(:first-child){margin-left:calc(var(--cw) * -0.5)}
-.meld.canasta .card{
-  box-shadow:0 0 0 1.5px rgba(255,213,74,.9),0 0 14px rgba(255,213,74,.7),0 2px 8px rgba(0,0,0,.6);
-}
+.meld.canasta .card{box-shadow:0 0 0 1.5px rgba(255,213,74,.9),0 0 14px rgba(255,213,74,.7),0 2px 8px rgba(0,0,0,.6)}
 .canasta-badge{
   position:absolute;top:-10px;left:50%;transform:translateX(-50%);
   font-size:8px;font-weight:900;letter-spacing:.8px;white-space:nowrap;
@@ -236,56 +201,28 @@ section{min-height:0;display:flex;flex-direction:column;justify-content:center;p
 .card{
   width:var(--cw);height:var(--ch);border-radius:calc(var(--cw)*.10);
   background:linear-gradient(155deg,#ffffff 0%,#fafafa 40%,#ececec 75%,#dcdcdc 100%);
-  color:#1a1a1a;position:relative;flex:0 0 auto;
-  font-family:'Georgia','Times New Roman',serif;
-  box-shadow:
-    0 1px 2px rgba(0,0,0,.3),
-    0 3px 8px rgba(0,0,0,.45),
-    inset 0 0 0 1px rgba(0,0,0,.08),
-    inset 0 1px 0 rgba(255,255,255,.9);
+  color:#1a1a1a;position:relative;flex:0 0 auto;font-family:'Georgia','Times New Roman',serif;
+  box-shadow:0 1px 2px rgba(0,0,0,.3),0 3px 8px rgba(0,0,0,.45),inset 0 0 0 1px rgba(0,0,0,.08),inset 0 1px 0 rgba(255,255,255,.9);
   transition:transform .18s cubic-bezier(.2,.9,.3,1.5),box-shadow .18s;
   will-change:transform;
 }
 .card.red{color:#c62828}
 .card.wild{background:linear-gradient(155deg,#fff8e1 0%,#ffefb8 50%,#ffdd7a 100%)}
-.card.wild::after{
-  content:'';position:absolute;inset:0;border-radius:inherit;
-  box-shadow:inset 0 0 0 2px rgba(255,160,0,.8);pointer-events:none;
-}
+.card.wild::after{content:'';position:absolute;inset:0;border-radius:inherit;box-shadow:inset 0 0 0 2px rgba(255,160,0,.8);pointer-events:none}
 .c-corner{position:absolute;display:flex;flex-direction:column;align-items:center;line-height:.92;font-weight:700}
 .c-corner.tl{top:5%;left:7%}
 .c-corner.br{bottom:5%;right:7%;transform:rotate(180deg)}
 .c-corner .r{font-size:calc(var(--cw)*.32);letter-spacing:-.5px}
 .c-corner .s{font-size:calc(var(--cw)*.26);margin-top:-1px}
-.c-center{
-  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
-  font-size:calc(var(--cw)*.46);opacity:.9;
-  text-shadow:0 1px 2px rgba(0,0,0,.1);
-}
-.card.back{
-  background:
-    repeating-linear-gradient(45deg,#1a237e 0 4px,#283593 4px 8px);
-  border:2px solid rgba(255,255,255,.95);
-  box-shadow:0 2px 8px rgba(0,0,0,.6),inset 0 0 0 1px rgba(255,255,255,.2);
-}
-.card.back::after{
-  content:'';position:absolute;inset:18%;border-radius:4px;
-  border:1.5px solid rgba(255,255,255,.5);
-  background:radial-gradient(circle,rgba(255,255,255,.2),transparent 70%);
-}
+.c-center{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:calc(var(--cw)*.46);opacity:.9;text-shadow:0 1px 2px rgba(0,0,0,.1)}
+.card.back{background:repeating-linear-gradient(45deg,#1a237e 0 4px,#283593 4px 8px);border:2px solid rgba(255,255,255,.95);box-shadow:0 2px 8px rgba(0,0,0,.6),inset 0 0 0 1px rgba(255,255,255,.2)}
+.card.back::after{content:'';position:absolute;inset:18%;border-radius:4px;border:1.5px solid rgba(255,255,255,.5);background:radial-gradient(circle,rgba(255,255,255,.2),transparent 70%)}
 
-.hand-row{
-  display:flex;justify-content:center;align-items:flex-end;
-  padding:8px 6px 6px;min-height:calc(var(--ch) + 16px);
-  position:relative;
-}
+.hand-row{display:flex;justify-content:center;align-items:flex-end;padding:8px 6px 6px;min-height:calc(var(--ch) + 16px);position:relative}
 .hand-row .card:not(:first-child){margin-left:calc(-1 * var(--ov,0px))}
 .hand-row .card{cursor:pointer;position:relative}
 .hand-row .card:hover{transform:translateY(-12px);z-index:99!important;box-shadow:0 12px 22px rgba(0,0,0,.65)}
-.hand-row .card.selected{
-  transform:translateY(-18px);z-index:120!important;
-  box-shadow:0 0 0 3px var(--gold),0 0 26px rgba(255,213,74,.9),0 12px 24px rgba(0,0,0,.6);
-}
+.hand-row .card.selected{transform:translateY(-18px);z-index:120!important;box-shadow:0 0 0 3px var(--gold),0 0 26px rgba(255,213,74,.9),0 12px 24px rgba(0,0,0,.6)}
 .cpu-hand .card{--cw:clamp(22px,7vmin,34px);cursor:default}
 .cpu-hand .card:hover{transform:none;box-shadow:0 2px 8px rgba(0,0,0,.55)}
 
@@ -306,32 +243,23 @@ section{min-height:0;display:flex;flex-direction:column;justify-content:center;p
   font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;
   color:var(--gold);box-shadow:0 3px 8px rgba(0,0,0,.7);
 }
-.empty-slot{
-  width:var(--cw);height:var(--ch);border-radius:calc(var(--cw)*.10);
-  border:2px dashed rgba(255,255,255,.3);background:rgba(0,0,0,.18);
-}
+.empty-slot{width:var(--cw);height:var(--ch);border-radius:calc(var(--cw)*.10);border:2px dashed rgba(255,255,255,.3);background:rgba(0,0,0,.18)}
 .status-msg{
   font-size:clamp(11px,2.6vw,13.5px);text-align:center;font-weight:600;
   max-width:min(48vw,280px);line-height:1.4;
-  text-shadow:0 2px 8px rgba(0,0,0,.9);opacity:.95;
-  transition:color .25s;
+  text-shadow:0 2px 8px rgba(0,0,0,.9);opacity:.95;transition:color .25s;
 }
 .status-msg.warn{color:#ffb4a2}
 .status-msg.good{color:#8dffb0}
 
-#controls{
-  display:flex;gap:8px;padding:10px 10px calc(10px + env(safe-area-inset-bottom));
-  justify-content:center;flex-wrap:wrap;
-  background:linear-gradient(0deg,rgba(0,0,0,.65),transparent);
-}
+#controls{display:flex;gap:8px;padding:10px 10px calc(10px + env(safe-area-inset-bottom));justify-content:center;flex-wrap:wrap;background:linear-gradient(0deg,rgba(0,0,0,.65),transparent)}
 button{
   font-family:inherit;font-size:clamp(11px,2.7vw,13.5px);font-weight:700;
   padding:11px 18px;border-radius:12px;border:1px solid rgba(255,255,255,.22);
   background:linear-gradient(180deg,rgba(255,255,255,.18),rgba(255,255,255,.05));
   color:#fff;cursor:pointer;letter-spacing:.3px;
   transition:transform .12s,box-shadow .2s,background .2s,opacity .2s;
-  box-shadow:0 4px 12px rgba(0,0,0,.4);
-  backdrop-filter:blur(6px);
+  box-shadow:0 4px 12px rgba(0,0,0,.4);backdrop-filter:blur(6px);
 }
 button:hover:not(:disabled){background:linear-gradient(180deg,rgba(255,255,255,.3),rgba(255,255,255,.1));transform:translateY(-2px)}
 button:active:not(:disabled){transform:translateY(0) scale(.96)}
@@ -352,11 +280,7 @@ button.danger{background:linear-gradient(180deg,#ef5350,#b71c1c);border-color:#f
 #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 #toast.err{border-color:#ff5252;color:#ffb3b3}
 
-#modal{
-  position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(8px);
-  display:flex;align-items:center;justify-content:center;z-index:1000;
-  opacity:0;pointer-events:none;transition:opacity .3s;padding:16px;
-}
+#modal{position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;z-index:1000;opacity:0;pointer-events:none;transition:opacity .3s;padding:16px}
 #modal.show{opacity:1;pointer-events:auto}
 .modal-box{
   background:linear-gradient(160deg,#1b4a2a,#0a2414);
@@ -377,44 +301,34 @@ button.danger{background:linear-gradient(180deg,#ef5350,#b71c1c);border-color:#f
 @keyframes popIn{from{transform:scale(.6) translateY(16px);opacity:0}to{transform:scale(1) translateY(0);opacity:1}}
 @keyframes dealIn{from{transform:translateY(-70px) rotate(-16deg) scale(.7);opacity:0}to{transform:translateY(0) rotate(0) scale(1);opacity:1}}
 .card.dealing{animation:dealIn .45s cubic-bezier(.2,1.2,.4,1) backwards}
-.float-pts{
-  position:fixed;font-weight:900;font-size:18px;color:var(--gold);
-  pointer-events:none;z-index:950;text-shadow:0 2px 12px rgba(0,0,0,.95);
-  animation:floatUp 1.4s ease-out forwards;
-}
+.float-pts{position:fixed;font-weight:900;font-size:18px;color:var(--gold);pointer-events:none;z-index:950;text-shadow:0 2px 12px rgba(0,0,0,.95);animation:floatUp 1.4s ease-out forwards}
 @keyframes floatUp{to{transform:translateY(-80px) scale(1.3);opacity:0}}
-.confetti{
-  position:fixed;width:10px;height:10px;pointer-events:none;z-index:940;
-  animation:confFall linear forwards;
-}
+.confetti{position:fixed;width:10px;height:10px;pointer-events:none;z-index:940;animation:confFall linear forwards}
 @keyframes confFall{to{transform:translateY(108vh) rotate(720deg);opacity:.1}}
 
-/* =====================================================
-   AJUSTES PARA MOBILE EM LANDSCAPE (telas baixas)
-===================================================== */
 @media (orientation: landscape) and (max-height: 550px){
-  #hud{ padding:4px 8px; }
-  .score-box{ min-width:60px; padding:2px 8px; }
-  .score-box .score{ font-size:16px; }
-  .score-box .label{ font-size:9px; letter-spacing:1px; }
-  #roundInfo{ font-size:11px; }
-  #targetInfo{ font-size:9px; }
-  section{ padding:1px 4px; }
-  .meld-row{ min-height:calc(var(--ch)*.55); padding:3px 2px; gap:8px; }
-  .hand-row{ min-height:calc(var(--ch) + 8px); padding:4px 4px 2px; }
-  #controls{ padding:4px 4px calc(4px + env(safe-area-inset-bottom)); gap:5px; }
-  button{ padding:7px 11px; font-size:11px; border-radius:9px; }
-  #tableCenter{ gap:14px; }
-  .status-msg{ font-size:11px; max-width:38vw; }
-  .pile{ padding:4px; }
+  #hud{padding:4px 8px}
+  .score-box{min-width:70px;padding:2px 8px}
+  .score-box .score{font-size:17px}
+  .score-box .label{font-size:9px;letter-spacing:1px}
+  .score-box .round-preview{font-size:9px}
+  #roundInfo{font-size:11px}
+  #targetInfo{font-size:9px}
+  .progress-track{height:4px;margin-top:4px}
+  section{padding:1px 4px}
+  .meld-row{min-height:calc(var(--ch)*.55);padding:3px 2px;gap:8px}
+  .hand-row{min-height:calc(var(--ch) + 8px);padding:4px 4px 2px}
+  #controls{padding:4px 4px calc(4px + env(safe-area-inset-bottom));gap:5px}
+  button{padding:7px 11px;font-size:11px;border-radius:9px}
+  #tableCenter{gap:14px}
+  .status-msg{font-size:11px;max-width:38vw}
+  .pile{padding:4px}
 }
-
-/* Telas muito pequenas (celulares compactos) */
 @media (max-height: 380px){
-  .meld-row{ min-height:calc(var(--ch)*.5); }
-  .hand-row{ min-height:calc(var(--ch) + 4px); padding:3px 3px 2px; }
-  #hud{ padding:3px 6px; }
-  button{ padding:6px 10px; font-size:10.5px; }
+  .meld-row{min-height:calc(var(--ch)*.5)}
+  .hand-row{min-height:calc(var(--ch) + 4px);padding:3px 3px 2px}
+  #hud{padding:3px 6px}
+  button{padding:6px 10px;font-size:10.5px}
 }
 </style>
 </head>
@@ -427,7 +341,7 @@ button.danger{background:linear-gradient(180deg,#ef5350,#b71c1c);border-color:#f
   <div class="screen show" id="menuScreen">
     <div class="menu-box">
       <h1>CANASTRA_MS</h1>
-      <div class="subtitle">Edição Premium</div>
+      <div class="subtitle">Edição Profissional</div>
       <button class="menu-btn primary" id="btnPlayOpen">🎴 Canastra Aberta (vs CPU)</button>
       <button class="menu-btn primary" id="btnPlay4p">👥 Canastra em Duplas (2v2)</button>
       <button class="menu-btn" id="btnSettings">⚙️ Configurações</button>
@@ -483,14 +397,17 @@ button.danger{background:linear-gradient(180deg,#ef5350,#b71c1c);border-color:#f
         <div class="score-box" id="cpuBox">
           <div class="label" id="oppLabel">CPU</div>
           <div class="score" id="cpuScore">0</div>
+          <div class="round-preview empty" id="cpuRoundPreview"></div>
         </div>
         <div class="center-hud">
           <div id="roundInfo">Rodada 1</div>
           <div id="targetInfo">Meta: 3000 pontos</div>
+          <div class="progress-track"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
         </div>
         <div class="score-box" id="humanBox">
           <div class="label">Você</div>
           <div class="score" id="humanScore">0</div>
+          <div class="round-preview empty" id="humanRoundPreview"></div>
         </div>
       </header>
 
@@ -533,76 +450,39 @@ button.danger{background:linear-gradient(180deg,#ef5350,#b71c1c);border-color:#f
   </div>
 
   <div id="toast"></div>
-
 </div>
 
 <script>
 /* =====================================================
-   DETECÇÃO DE PLATAFORMA (runtime)
+   DETECÇÃO DE PLATAFORMA
 ===================================================== */
-const IS_MOBILE_CLASS = document.documentElement.classList.contains('is-mobile');
-const IS_MOBILE = IS_MOBILE_CLASS;
+const IS_MOBILE = document.documentElement.classList.contains('is-mobile');
 const IS_IOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 const IS_ANDROID = /Android/.test(navigator.userAgent);
 
 /* =====================================================
-   BLOQUEIO DE ORIENTAÇÃO (tentativa — só funciona em alguns navegadores)
+   BLOQUEIO DE ORIENTAÇÃO
 ===================================================== */
 let orientationAttempted = false;
-let orientationLocked = false;
-
 async function tryLockOrientation(){
   if (orientationAttempted || !IS_MOBILE) return;
   orientationAttempted = true;
-
   try {
-    // 1. Fullscreen (necessário para orientation lock)
     const el = document.documentElement;
-    if (el.requestFullscreen) {
-      await el.requestFullscreen().catch(()=>{});
-    } else if (el.webkitRequestFullscreen) {
-      el.webkitRequestFullscreen();
-    }
-
-    // 2. Orientation lock (só funciona com fullscreen)
+    if (el.requestFullscreen) await el.requestFullscreen().catch(()=>{});
+    else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
     if (screen.orientation && typeof screen.orientation.lock === 'function') {
       await screen.orientation.lock('landscape');
-      orientationLocked = true;
-    } else if (screen.lockOrientation) {
-      screen.lockOrientation('landscape');
-      orientationLocked = true;
-    } else if (screen.mozLockOrientation) {
-      screen.mozLockOrientation('landscape');
-      orientationLocked = true;
-    }
-  } catch(e) {
-    // Fallback silencioso — CSS rotation já cuida disso
-    console.log('[Canastra_MS] Orientation lock indisponível, usando CSS rotation');
-  }
-}
-
-async function releaseOrientation(){
-  if (!IS_MOBILE) return;
-  try {
-    if (screen.orientation && screen.orientation.unlock) screen.orientation.unlock();
-    if (document.fullscreenElement && document.exitFullscreen) {
-      await document.exitFullscreen().catch(()=>{});
-    }
+    } else if (screen.lockOrientation) screen.lockOrientation('landscape');
+    else if (screen.mozLockOrientation) screen.mozLockOrientation('landscape');
   } catch(e) {}
-  orientationAttempted = false;
-  orientationLocked = false;
 }
-
-/* Ativa o lock no primeiro toque/clique em qualquer lugar */
-function onFirstInteraction(){
-  if (!IS_MOBILE) return;
-  tryLockOrientation();
-}
+function onFirstInteraction(){ if(IS_MOBILE) tryLockOrientation(); }
 document.addEventListener('touchstart', onFirstInteraction, { once: true, passive: true });
 document.addEventListener('click', onFirstInteraction, { once: true });
 
 /* =====================================================
-   CONFIGURAÇÕES GLOBAIS
+   CONFIGURAÇÕES
 ===================================================== */
 const SUITS = ['♠','♥','♦','♣'];
 const RANKS = ['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
@@ -619,36 +499,23 @@ let gameMode = '2p';
    PERSISTÊNCIA
 ===================================================== */
 function loadSettings(){
-  try{
-    const s = JSON.parse(localStorage.getItem('canastra_ms_settings'));
-    if(s) settings = {...settings, ...s};
-  }catch(e){}
+  try{ const s = JSON.parse(localStorage.getItem('canastra_ms_settings')); if(s) settings = {...settings, ...s}; }catch(e){}
   applySettings();
 }
-function saveSettings(){
-  try{ localStorage.setItem('canastra_ms_settings', JSON.stringify(settings)); }catch(e){}
-}
+function saveSettings(){ try{ localStorage.setItem('canastra_ms_settings', JSON.stringify(settings)); }catch(e){} }
 function loadStats(){
-  try{
-    const s = JSON.parse(localStorage.getItem('canastra_ms_stats'));
-    if(s) stats = {...stats, ...s};
-  }catch(e){}
+  try{ const s = JSON.parse(localStorage.getItem('canastra_ms_stats')); if(s) stats = {...stats, ...s}; }catch(e){}
 }
-function saveStats(){
-  try{ localStorage.setItem('canastra_ms_stats', JSON.stringify(stats)); }catch(e){}
-}
+function saveStats(){ try{ localStorage.setItem('canastra_ms_stats', JSON.stringify(stats)); }catch(e){} }
 
 function applySettings(){
   document.getElementById('settingTarget').value = settings.target;
   document.getElementById('settingSound').checked = settings.sound;
   setTheme(settings.theme, false);
 }
-
 function setTheme(theme, save=true){
   document.body.className = theme === 'green' ? '' : 'theme-' + theme;
-  document.querySelectorAll('.theme-dot').forEach(d => {
-    d.classList.toggle('active', d.dataset.theme === theme);
-  });
+  document.querySelectorAll('.theme-dot').forEach(d => d.classList.toggle('active', d.dataset.theme === theme));
   if(save){ settings.theme = theme; saveSettings(); }
 }
 
@@ -657,11 +524,7 @@ function setTheme(theme, save=true){
 ===================================================== */
 const $ = id => document.getElementById(id);
 const sleep = ms => new Promise(r => setTimeout(r, ms));
-
-function shuffle(a){
-  for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; }
-  return a;
-}
+function shuffle(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
 
 let audioCtx = null, muted = false;
 function beep(freq, dur=0.09, type='sine', vol=0.07){
@@ -695,8 +558,7 @@ function toast(msg, isErr=false){
 
 function floatPoints(x, y, text){
   const el = document.createElement('div');
-  el.className = 'float-pts';
-  el.textContent = text;
+  el.className = 'float-pts'; el.textContent = text;
   el.style.left = x + 'px'; el.style.top = y + 'px';
   document.body.appendChild(el);
   setTimeout(()=>el.remove(), 1400);
@@ -720,7 +582,7 @@ function confettiBurst(n = 50){
 }
 
 /* =====================================================
-   BARALHO (108 CARTAS)
+   BARALHO
 ===================================================== */
 function makeDeck(){
   const d = []; let id = 0;
@@ -731,9 +593,7 @@ function makeDeck(){
       }
     }
   }
-  for(let i=0;i<4;i++){
-    d.push({ id:id++, rank:'JOKER', suit:'★', value:50, wild:true });
-  }
+  for(let i=0;i<4;i++) d.push({ id:id++, rank:'JOKER', suit:'★', value:50, wild:true });
   return d;
 }
 function sortHand(h){
@@ -745,7 +605,7 @@ function sortHand(h){
 }
 
 /* =====================================================
-   ESTADO DO JOGO
+   ESTADO
 ===================================================== */
 function newPlayerState(id, team){
   return { id, team, hand:[], melds:[], score:0, hasMelded:false, isHuman: id === 'human' };
@@ -753,32 +613,29 @@ function newPlayerState(id, team){
 
 function newGame(mode){
   gameMode = mode;
-  const target = settings.target;
-
   G = {
     stock: [], discard: [], mortos: [],
     mortoTaken: { A:false, B:false },
     players: {}, turnOrder: [], turnIndex: 0,
     phase: 'draw', round: 1, selected: new Set(),
-    busy: false, mode, target
+    busy: false, mode, target: settings.target
   };
 
   if(mode === '4p'){
     G.players = {
-      human:   newPlayerState('human', 'A'),
+      human: newPlayerState('human', 'A'),
       partner: newPlayerState('partner', 'A'),
-      opp1:    newPlayerState('opp1', 'B'),
-      opp2:    newPlayerState('opp2', 'B')
+      opp1: newPlayerState('opp1', 'B'),
+      opp2: newPlayerState('opp2', 'B')
     };
     G.turnOrder = ['human', 'opp1', 'partner', 'opp2'];
   } else {
     G.players = {
       human: newPlayerState('human', 'A'),
-      cpu:   newPlayerState('cpu', 'B')
+      cpu: newPlayerState('cpu', 'B')
     };
     G.turnOrder = ['human', 'cpu'];
   }
-
   startRound(true);
 }
 
@@ -798,20 +655,12 @@ function startRound(first){
   }
   if(first) G.round = 1;
 
-  for(let i=0;i<11;i++){
-    for(const k in G.players){
-      if(G.stock.length) G.players[k].hand.push(G.stock.pop());
-    }
-  }
-  for(const k in G.players){
-    if(G.players[k].isHuman) sortHand(G.players[k].hand);
-  }
+  for(let i=0;i<11;i++) for(const k in G.players) if(G.stock.length) G.players[k].hand.push(G.stock.pop());
+  for(const k in G.players) if(G.players[k].isHuman) sortHand(G.players[k].hand);
 
   for(let m=0;m<2;m++){
     const morto = [];
-    for(let i=0;i<11;i++){
-      if(G.stock.length) morto.push(G.stock.pop());
-    }
+    for(let i=0;i<11;i++) if(G.stock.length) morto.push(G.stock.pop());
     G.mortos.push(morto);
   }
 
@@ -825,8 +674,7 @@ function startRound(first){
 }
 
 function dealAnimation(){
-  const cards = document.querySelectorAll('#humanHand .card');
-  cards.forEach((c,i)=>{
+  document.querySelectorAll('#humanHand .card').forEach((c,i)=>{
     c.classList.add('dealing');
     c.style.animationDelay = (i*0.035) + 's';
   });
@@ -838,8 +686,7 @@ function dealAnimation(){
 function validateMeld(p, cards){
   if(!cards.length) return { ok:false, msg:'Selecione cartas para melar.' };
   const wilds = cards.filter(c=>c.wild);
-  const nats  = cards.filter(c=>!c.wild);
-
+  const nats = cards.filter(c=>!c.wild);
   if(!nats.length) return { ok:false, msg:'Uma sequência precisa de cartas naturais (2 e Joker são curingas).' };
   const suit = nats[0].suit;
   if(nats.some(c=>c.suit !== suit)) return { ok:false, msg:'Todas as cartas naturais devem ser do mesmo naipe.' };
@@ -852,12 +699,12 @@ function validateMeld(p, cards){
   }
 
   const existing = p.melds.find(m=>m.suit === suit);
-  const totalNat  = nats.length + (existing ? existing.natCount : 0);
+  const totalNat = nats.length + (existing ? existing.natCount : 0);
   const totalWild = wilds.length + (existing ? existing.wildCount : 0);
   const totalCards = totalNat + totalWild;
 
   if(totalCards < 3) return { ok:false, msg:'Uma sequência precisa de pelo menos 3 cartas.' };
-  if(totalWild > 2)  return { ok:false, msg:'Máximo de 2 curingas por sequência.' };
+  if(totalWild > 2) return { ok:false, msg:'Máximo de 2 curingas por sequência.' };
   if(totalWild > totalNat) return { ok:false, msg:'Curingas não podem exceder as cartas naturais.' };
 
   const ranks = sorted.map(c=>RANK_ORDER[c.rank]);
@@ -882,6 +729,38 @@ function canastaBonus(meld){
     return 200;
   }
   return 100;
+}
+
+/* =====================================================
+   HELPERS DE PONTUAÇÃO
+===================================================== */
+function getMeldPoints(p){
+  let total = 0;
+  for(const m of p.melds){
+    total += m.cards.reduce((s,c)=>s + c.value, 0);
+    total += canastaBonus(m);
+  }
+  return total;
+}
+function getHandPoints(p){
+  return p.hand.reduce((s,c)=>s + c.value, 0);
+}
+function getRoundPreview(p){
+  return getMeldPoints(p) - getHandPoints(p);
+}
+function getTeamScore(team){
+  let total = 0;
+  for(const k in G.players){
+    if(G.players[k].team === team) total += G.players[k].score;
+  }
+  return total;
+}
+function getTeamMeldPoints(team){
+  let total = 0;
+  for(const k in G.players){
+    if(G.players[k].team === team) total += getMeldPoints(G.players[k]);
+  }
+  return total;
 }
 
 /* =====================================================
@@ -913,17 +792,14 @@ function commitMeld(p, cards, suit, silent){
     const label = bonus === 1000 ? 'CANASTRA DE 1000!' : bonus === 500 ? 'CANASTRA DE 500!' : (meld.wildCount === 0 ? 'CANASTRA LIMPA! +200' : 'CANASTRA SUJA! +100');
     floatPoints(mx-60, my, label);
     confettiBurst(75);
-    sfxCanastra();
+    sfxCanasta();
   }
   return meld;
 }
 
 function drawFromStock(p, count=2){
   let n = 0;
-  for(let i=0;i<count && G.stock.length;i++){
-    p.hand.push(G.stock.pop());
-    n++;
-  }
+  for(let i=0;i<count && G.stock.length;i++){ p.hand.push(G.stock.pop()); n++; }
   if(p.isHuman) sortHand(p.hand);
   sfxDraw();
   return n;
@@ -933,21 +809,16 @@ function canTakeDiscard(p){
   if(!G.discard.length) return false;
   const top = G.discard[G.discard.length-1];
   if(top.wild) return false;
-
   const hand = p.hand.filter(c => c.id !== top.id);
   const nats = hand.filter(c => !c.wild && c.suit === top.suit);
-
   if(nats.length >= 1){
     for(let i=0;i<nats.length;i++){
-      const test1 = [top, nats[i]];
-      if(validateMeld(p, test1).ok) return true;
+      if(validateMeld(p, [top, nats[i]]).ok) return true;
       for(let j=i+1;j<nats.length;j++){
-        const test2 = [top, nats[i], nats[j]];
-        if(validateMeld(p, test2).ok) return true;
+        if(validateMeld(p, [top, nats[i], nats[j]]).ok) return true;
       }
     }
   }
-
   const meld = p.melds.find(m => m.suit === top.suit);
   if(meld && meld.cards.length < 13) return true;
   return false;
@@ -975,11 +846,19 @@ function discardCard(p, card){
 }
 
 /* =====================================================
-   TURNO DO JOGADOR
+   TURNO HUMANO
 ===================================================== */
 function humanDraw(){
   if(!isHumanTurn() || G.phase !== 'draw' || G.busy) return;
-  if(!G.stock.length){ endRound(null, 'O monte acabou!'); return; }
+  if(!G.stock.length){
+    // ✅ FIX: só encerra se também não puder pegar o lixo
+    if(canTakeDiscard(G.players.human)){
+      toast('O monte acabou. Pegue o lixo para continuar!', true);
+      return;
+    }
+    endRound(null, 'O monte acabou e ninguém pode pegar o lixo!');
+    return;
+  }
   G.busy = true;
   drawFromStock(G.players.human, 2);
   G.phase = 'action';
@@ -1022,28 +901,39 @@ function humanDiscard(){
 
   const card = sel[0];
   const willEmpty = (p.hand.length === 1);
-  const hasCanastraLimpa = p.melds.some(m => m.canasta && m.wildCount === 0);
+  const hasCanastraLimpa = p.melds.some(m => m.canastra && m.wildCount === 0);
   const mortoPego = G.mortoTaken[p.team];
+  const canWin = hasCanastraLimpa && mortoPego;
 
-  if(willEmpty && (!hasCanastraLimpa || !mortoPego)){
-    sfxError();
-    if(!hasCanastraLimpa) toast('Você precisa de uma CANASTRA LIMPA para bater!', true);
-    else toast('Você precisa pegar o MORTO antes de bater!', true);
-    return;
+  // ✅ FIX: bloqueia descarte final só se houver outras jogadas
+  if(willEmpty && !canWin){
+    const hasOtherMoves = G.stock.length > 0 || canTakeDiscard(p);
+    if(hasOtherMoves){
+      sfxError();
+      if(!hasCanastraLimpa && !mortoPego) toast('Você precisa de CANASTRA LIMPA e do MORTO para bater!', true);
+      else if(!hasCanastraLimpa) toast('Você precisa de uma CANASTRA LIMPA para bater!', true);
+      else toast('Você precisa pegar o MORTO antes de bater!', true);
+      return;
+    }
+    // Sem outras jogadas — descarte forçado
+    toast('Sem mais jogadas — descartando sua última carta.', true);
   }
 
   discardCard(p, card);
   G.selected.clear();
 
-  if(p.hand.length === 0 && !G.mortoTaken[p.team]){
-    takeMorto(p);
-    render();
-    endTurn();
-    return;
-  }
-
-  if(p.hand.length === 0 && G.mortoTaken[p.team]){
-    endRound(p.team, 'Você bateu! 🎉');
+  if(p.hand.length === 0){
+    if(!G.mortoTaken[p.team]){
+      takeMorto(p);
+      render();
+      endTurn();
+      return;
+    }
+    if(canWin){
+      endRound(p.team, 'Você bateu! 🎉');
+    } else {
+      endRound(null, 'Você ficou sem cartas sem bater.');
+    }
     return;
   }
 
@@ -1058,7 +948,7 @@ function takeMorto(p){
   if(p.isHuman) sortHand(p.hand);
   G.mortoTaken[p.team] = true;
   sfxCanasta();
-  toast('Você pegou o MORTO! +11 cartas');
+  toast('Você pegou o MORTO! +' + morto.length + ' cartas');
   const el = $('stockPile').getBoundingClientRect();
   floatPoints(el.left, el.top, 'MORTO!');
 }
@@ -1075,14 +965,13 @@ function endTurn(){
   const current = G.turnOrder[G.turnIndex];
   const currentPlayer = G.players[current];
 
+  // ✅ FIX: encerra rodada se próximo não pode agir (monte vazio + não pode pegar lixo)
   if(!G.stock.length && !canTakeDiscard(currentPlayer)){
     endRound(null, 'O monte acabou!');
     return;
   }
 
-  if(current !== 'human' && !G.busy){
-    setTimeout(() => botTurn(current), 550);
-  }
+  if(current !== 'human' && !G.busy) setTimeout(() => botTurn(current), 550);
 }
 
 async function botTurn(playerId){
@@ -1092,6 +981,7 @@ async function botTurn(playerId){
   render();
   await sleep(450);
 
+  // ✅ FIX: encerra se não pode comprar nem pegar lixo
   if(!G.stock.length && !canTakeDiscard(p)){
     G.busy = false;
     endRound(null, 'O monte acabou!');
@@ -1127,15 +1017,36 @@ async function botTurn(playerId){
 
   if(!p.hand.length){
     G.busy = false;
-    endRound(p.team, getPlayerName(p) + ' bateu!');
+    if(!G.mortoTaken[p.team]){
+      takeMorto(p);
+      render();
+      await sleep(300);
+      G.busy = false;
+      endTurn();
+    } else {
+      endRound(null, getPlayerName(p) + ' ficou sem cartas.');
+    }
     return;
   }
 
-  const hasCanastraLimpa = p.melds.some(m => m.canasta && m.wildCount === 0);
+  const hasCanastraLimpa = p.melds.some(m => m.canastra && m.wildCount === 0);
   const mortoPego = G.mortoTaken[p.team];
+  const canWin = hasCanastraLimpa && mortoPego;
+  const willEmpty = (p.hand.length === 1);
+
   let card;
-  if(p.hand.length === 1 && hasCanastraLimpa && mortoPego){
-    card = p.hand[0];
+  if(willEmpty && canWin){
+    card = p.hand[0]; // Vitória
+  } else if(willEmpty && !canWin && mortoPego){
+    // Bot não pode vencer e morto já foi — força descarte
+    const hasOtherMoves = G.stock.length > 0 || canTakeDiscard(p);
+    if(hasOtherMoves){
+      // Ainda há jogadas — bot deve tentar usar outra estratégia
+      // Como só tem 1 carta, força descarte mesmo assim
+      card = botChooseDiscard(p);
+    } else {
+      card = botChooseDiscard(p);
+    }
   } else {
     card = botChooseDiscard(p);
   }
@@ -1144,15 +1055,21 @@ async function botTurn(playerId){
   render();
   await sleep(450);
 
+  // Pega morto se esvaziou
   if(p.hand.length === 0 && !G.mortoTaken[p.team]){
     takeMorto(p);
     render();
     await sleep(350);
   }
 
-  if(p.hand.length === 0 && G.mortoTaken[p.team]){
+  // ✅ FIX: só declara vitória se realmente venceu
+  if(p.hand.length === 0){
     G.busy = false;
-    endRound(p.team, getPlayerName(p) + ' bateu!');
+    if(canWin){
+      endRound(p.team, getPlayerName(p) + ' bateu!');
+    } else {
+      endRound(null, getPlayerName(p) + ' ficou sem cartas.');
+    }
     return;
   }
 
@@ -1205,8 +1122,7 @@ function botPlanMelds(p){
     const cards = bySuit[suit].filter(c => !c.wild).sort((a,b)=>RANK_ORDER[a.rank] - RANK_ORDER[b.rank]);
     for(let i=0;i<cards.length-1;i++){
       if(wi < wilds.length && plan.length < 4){
-        const run = [cards[i], cards[i+1]];
-        const test = [...run, wilds[wi]];
+        const test = [cards[i], cards[i+1], wilds[wi]];
         if(validateMeld(p, test).ok){
           plan.push({ suit, cards: test });
           hand = hand.filter(c => !test.some(x => x.id === c.id));
@@ -1244,40 +1160,51 @@ function endRound(winningTeam, reason){
   G.busy = true;
 
   const results = {};
-  let teamScores = { A: 0, B: 0 };
+  const roundScores = { A: 0, B: 0 };
 
   for(const k in G.players){
     const p = G.players[k];
-    let meldPts = 0, canPts = 0;
-    for(const m of p.melds){
-      meldPts += m.cards.reduce((s,c)=>s + c.value, 0);
-      canPts += canastaBonus(m);
-    }
-    const handPts = p.hand.reduce((s,c)=>s + c.value, 0);
+    const meldPts = getMeldPoints(p);
+    let canPts = 0;
+    for(const m of p.melds) canPts += canastaBonus(m);
+    const handPts = getHandPoints(p);
     const outBonus = (p.team === winningTeam) ? 100 : 0;
     const mortoPenalty = G.mortoTaken[p.team] ? 0 : -100;
     const total = meldPts + canPts - handPts + outBonus + mortoPenalty;
+
     results[k] = { name: getPlayerName(p), meldPts, canPts, handPts, outBonus, mortoPenalty, total, team: p.team };
-    teamScores[p.team] += total;
-    p.score += total;
+    roundScores[p.team] += total;
+    p.score += total;  // ✅ Acumula no placar do jogador
   }
 
   stats.games++;
-  if(winningTeam === 'A') stats.wins++; else stats.losses++;
+  if(winningTeam === 'A') stats.wins++;
+  else stats.losses++;
   saveStats();
 
   render();
+
   if(winningTeam === 'A'){ confettiBurst(130); sfxWin(); }
   else if(winningTeam === 'B'){ beep(220,0.3,'sawtooth',0.06); }
 
-  showRoundModal(results, teamScores, winningTeam, reason);
+  showRoundModal(results, roundScores, winningTeam, reason);
 }
 
-function showRoundModal(res, teamScores, winningTeam, reason){
-  const isGameOver = teamScores.A >= G.target || teamScores.B >= G.target;
-  $('modalTitle').textContent = isGameOver
-    ? (teamScores.A > teamScores.B ? '🏆 Você Venceu!' : '😖 A CPU Venceu')
-    : 'Fim da Rodada ' + G.round;
+function showRoundModal(res, roundScores, winningTeam, reason){
+  // ✅ FIX: usar pontuação ACUMULADA para decidir fim de jogo
+  const totalA = getTeamScore('A');
+  const totalB = getTeamScore('B');
+  const isGameOver = totalA >= G.target || totalB >= G.target;
+
+  let title;
+  if(isGameOver){
+    if(totalA > totalB) title = '🏆 Você Venceu!';
+    else if(totalB > totalA) title = '😖 A CPU Venceu';
+    else title = '🤝 Empate!';
+  } else {
+    title = 'Fim da Rodada ' + G.round;
+  }
+  $('modalTitle').textContent = title;
 
   const fmt = n => (n >= 0 ? '+' : '') + n;
   const cls = n => n >= 0 ? 'pos' : 'neg';
@@ -1294,11 +1221,15 @@ function showRoundModal(res, teamScores, winningTeam, reason){
     html += '<tr><td>Mão</td><td class="' + cls(-r.handPts) + '">' + fmt(-r.handPts) + '</td></tr>';
     if(r.outBonus) html += '<tr><td>Batida</td><td class="pos">+100</td></tr>';
     if(r.mortoPenalty) html += '<tr><td>Morto não pego</td><td class="neg">-100</td></tr>';
-    html += '<tr class="total"><td>Total</td><td class="' + cls(r.total) + '">' + fmt(r.total) + '</td></tr>';
+    html += '<tr class="total"><td>Total da rodada</td><td class="' + cls(r.total) + '">' + fmt(r.total) + '</td></tr>';
     html += '<tr><td colspan="2" style="height:8px"></td></tr>';
   }
 
-  html += '<tr class="total"><td>PLACAR GERAL</td><td>' + G.players.human.score + ' × ' + G.players.cpu.score + '</td></tr>';
+  html += '<tr class="total"><td>PLACAR ACUMULADO</td><td>' + totalA + ' × ' + totalB + '</td></tr>';
+  if(!isGameOver){
+    const falta = Math.min(G.target - totalA, G.target - totalB);
+    html += '<tr><td colspan="2" style="text-align:center;font-size:11px;opacity:.7;padding-top:8px">Faltam ' + falta + ' pts para a meta</td></tr>';
+  }
   html += '</table>';
 
   $('modalBody').innerHTML = html;
@@ -1352,16 +1283,43 @@ function toggleSelect(id){
 function render(){
   if(!G) return;
 
-  $('humanScore').textContent = G.players.human.score;
-  $('cpuScore').textContent = G.players.cpu.score;
+  const totalA = getTeamScore('A');
+  const totalB = getTeamScore('B');
+
+  $('humanScore').textContent = totalA;
+  $('cpuScore').textContent = totalB;
   $('roundInfo').textContent = 'Rodada ' + G.round;
   $('targetInfo').textContent = 'Meta: ' + G.target + ' pontos';
 
+  // ✅ Preview de pontos em tempo real
+  const previewA = getTeamMeldPoints('A');
+  const previewB = getTeamMeldPoints('B');
+
+  const hPreview = $('humanRoundPreview');
+  hPreview.textContent = previewA > 0 ? '+' + previewA + ' pts' : '—';
+  hPreview.classList.toggle('empty', previewA === 0);
+  hPreview.classList.remove('neg');
+
+  const cPreview = $('cpuRoundPreview');
+  cPreview.textContent = previewB > 0 ? '+' + previewB + ' pts' : '—';
+  cPreview.classList.toggle('empty', previewB === 0);
+  cPreview.classList.remove('neg');
+
+  // ✅ Progresso em direção à meta (do jogador A)
+  const progress = Math.max(0, Math.min(100, (totalA / G.target) * 100));
+  $('progressFill').style.width = progress + '%';
+
+  // ✅ Indicador de líder
+  $('humanBox').classList.toggle('leading', totalA > totalB && G.round > 1);
+  $('cpuBox').classList.toggle('leading', totalB > totalA && G.round > 1);
   $('humanBox').classList.toggle('active', isHumanTurn());
   $('cpuBox').classList.toggle('active', !isHumanTurn());
 
-  renderHands(); renderMelds(); renderPiles();
-  updateStatus(); updateButtons();
+  renderHands();
+  renderMelds();
+  renderPiles();
+  updateStatus();
+  updateButtons();
   requestAnimationFrame(layoutHand);
 }
 
@@ -1468,7 +1426,18 @@ function updateStatus(){
       el.classList.add('good');
     } else { el.textContent = v.msg; el.classList.add('warn'); }
   } else {
-    el.textContent = 'Selecione cartas para melar ou 1 para descartar';
+    const hasCanastraLimpa = p.melds.some(m => m.canastra && m.wildCount === 0);
+    const mortoPego = G.mortoTaken[p.team];
+    if(hasCanastraLimpa && mortoPego){
+      el.textContent = '✓ Pronto para bater! Descarte sua última carta.';
+      el.classList.add('good');
+    } else if(hasCanastraLimpa){
+      el.textContent = 'Falta o MORTO para bater!';
+    } else if(mortoPego){
+      el.textContent = 'Falta uma CANASTRA LIMPA para bater!';
+    } else {
+      el.textContent = 'Selecione cartas para melar ou 1 para descartar';
+    }
   }
 }
 
@@ -1510,10 +1479,7 @@ function showMenu(){
   $('settingsScreen').classList.remove('show');
   $('statsScreen').classList.remove('show');
   $('modal').classList.remove('show');
-  // Libera orientação/fullscreen ao voltar ao menu (opcional)
-  // releaseOrientation(); // descomente se quiser
 }
-
 function showGame(){
   $('menuScreen').classList.remove('show');
   $('gameScreen').classList.add('show');
@@ -1594,16 +1560,11 @@ $('btnSound').addEventListener('click', () => {
   if(!muted) beep(660, 0.08);
 });
 
-/* Re-renderização em resize/orientationchange */
 window.addEventListener('resize', () => requestAnimationFrame(layoutHand));
 window.addEventListener('orientationchange', () => {
-  setTimeout(() => {
-    layoutHand();
-    if(G) render();
-  }, 250);
+  setTimeout(() => { layoutHand(); if(G) render(); }, 250);
 });
 
-/* Atalhos de teclado (desktop) */
 document.addEventListener('keydown', e => {
   if(e.key === 'd' || e.key === 'D') { if(!$('btnDraw').disabled) humanDraw(); }
   if(e.key === 'm' || e.key === 'M') { if(!$('btnMeld').disabled) humanMeld(); }
@@ -1627,7 +1588,7 @@ newGame = function(mode){
   document.querySelector('#cpuBox .label').textContent = is4p ? 'Oponente' : 'CPU';
 };
 
-console.log('[Canastra_MS] Plataforma detectada:', IS_MOBILE ? 'MOBILE' : 'DESKTOP', '| iOS:', IS_IOS, '| Android:', IS_ANDROID);
+console.log('[Canastra_MS] Pronto. Plataforma:', IS_MOBILE ? 'MOBILE' : 'DESKTOP');
 </script>
 </body>
 </html>
