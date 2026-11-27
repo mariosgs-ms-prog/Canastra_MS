@@ -16,19 +16,25 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 :root{
-  --cw: clamp(30px, 10vmin, 64px);
+  --cw: clamp(38px, 12vmin, 80px);
   --ch: calc(var(--cw) * 1.42);
   --gold:#ffd54a;
   --gold-dark:#e6a400;
-  --felt1:#0e5c2f;
-  --felt2:#063318;
 }
 html,body{height:100%}
 body{
   font-family:'Segoe UI',system-ui,-apple-system,sans-serif;
   background: radial-gradient(ellipse at 50% 0%, #1b7a3e 0%, #0d4a25 38%, #052010 100%);
   color:#fff;overflow:hidden;user-select:none;
+  transition: background .5s;
 }
+body.theme-dark{ background: radial-gradient(ellipse at 50% 0%, #1a1a2e 0%, #16213e 38%, #0f0f1a 100%); }
+body.theme-light{ background: radial-gradient(ellipse at 50% 0%, #2e7d32 0%, #1b5e20 38%, #0d2b10 100%); }
+body.theme-blue{ background: radial-gradient(ellipse at 50% 0%, #1976d2 0%, #0d47a1 38%, #04162e 100%); }
+body.theme-purple{ background: radial-gradient(ellipse at 50% 0%, #8e24aa 0%, #4a148c 38%, #1a0033 100%); }
+body.theme-red{ background: radial-gradient(ellipse at 50% 0%, #e53935 0%, #b71c1c 38%, #2d0000 100%); }
+body.theme-amber{ background: radial-gradient(ellipse at 50% 0%, #ffb300 0%, #b8860b 38%, #2a2000 100%); }
+
 body::before{
   content:'';position:fixed;inset:0;pointer-events:none;
   background:
@@ -59,19 +65,26 @@ body::before{
   html.is-mobile #rotateHint{display:block}
 }
 
+/* =====================================================
+   TELAS — scroll + layout adaptativo
+===================================================== */
 .screen{
-  position:fixed;inset:0;display:flex;flex-direction:column;
-  align-items:center;justify-content:center;z-index:2000;
-  background:rgba(0,0,0,.78);backdrop-filter:blur(12px);
-  opacity:0;pointer-events:none;transition:opacity .35s;padding:20px;
+  position:absolute;inset:0;display:flex;flex-direction:column;
+  align-items:center;justify-content:flex-start;
+  z-index:2000;background:rgba(0,0,0,.78);backdrop-filter:blur(12px);
+  opacity:0;pointer-events:none;transition:opacity .35s;
+  padding: max(18px, env(safe-area-inset-top)) 16px max(18px, env(safe-area-inset-bottom));
+  overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;
 }
 .screen.show{opacity:1;pointer-events:auto}
+
 #menuScreen .menu-box{
   background:linear-gradient(160deg,#1b4a2a,#0a2414);
   border:1px solid rgba(255,213,74,.4);border-radius:24px;
-  padding:36px 30px;max-width:420px;width:100%;text-align:center;
+  padding:32px 26px;max-width:440px;width:100%;text-align:center;
   box-shadow:0 30px 90px rgba(0,0,0,.9),0 0 80px rgba(255,213,74,.12);
   position:relative;overflow:hidden;
+  margin: auto 0;
 }
 #menuScreen .menu-box::before{
   content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;
@@ -82,9 +95,10 @@ body::before{
   color:var(--gold);text-shadow:0 4px 24px rgba(255,213,74,.5);
   margin-bottom:4px;font-weight:900;position:relative;
 }
-#menuScreen .subtitle{font-size:11px;opacity:.6;letter-spacing:5px;text-transform:uppercase;margin-bottom:28px}
+#menuScreen .subtitle{font-size:11px;opacity:.6;letter-spacing:5px;text-transform:uppercase;margin-bottom:24px}
+.menu-buttons{display:flex;flex-direction:column;gap:8px}
 .menu-btn{
-  display:block;width:100%;margin:9px 0;padding:15px 18px;
+  display:block;width:100%;margin:0;padding:14px 18px;
   font-size:15px;font-weight:700;border-radius:14px;
   border:1px solid rgba(255,255,255,.15);cursor:pointer;
   background:linear-gradient(180deg,rgba(255,255,255,.13),rgba(255,255,255,.04));
@@ -99,34 +113,85 @@ body::before{
 .settings-box, .stats-box{
   background:linear-gradient(160deg,#1b4a2a,#0a2414);
   border:1px solid rgba(255,213,74,.4);border-radius:22px;
-  padding:30px 26px;max-width:460px;width:100%;
-  box-shadow:0 30px 90px rgba(0,0,0,.9);max-height:92vh;overflow-y:auto;
+  padding:26px 22px;max-width:480px;width:100%;
+  box-shadow:0 30px 90px rgba(0,0,0,.9);
+  margin: auto 0;
 }
-.settings-box h2, .stats-box h2{font-size:21px;color:var(--gold);margin-bottom:20px;letter-spacing:1px}
+.settings-box h2, .stats-box h2{font-size:20px;color:var(--gold);margin-bottom:16px;letter-spacing:1px}
 .setting-row{
   display:flex;align-items:center;justify-content:space-between;
-  padding:13px 0;border-bottom:1px solid rgba(255,255,255,.08);font-size:14px;gap:12px;
+  padding:12px 0;border-bottom:1px solid rgba(255,255,255,.08);font-size:14px;gap:12px;
 }
 .setting-row label{opacity:.85;flex:1}
 .setting-row select{
   background:rgba(0,0,0,.45);color:#fff;border:1px solid rgba(255,255,255,.2);
-  border-radius:8px;padding:9px 12px;font-size:13px;font-family:inherit;min-width:110px;
+  border-radius:8px;padding:8px 10px;font-size:13px;font-family:inherit;min-width:100px;
 }
-.theme-dots{display:flex;gap:10px}
+.theme-dots{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
 .theme-dot{
-  width:30px;height:30px;border-radius:50%;cursor:pointer;
+  width:28px;height:28px;border-radius:50%;cursor:pointer;
   border:2px solid transparent;transition:transform .15s,border-color .2s;
 }
 .theme-dot:hover{transform:scale(1.15)}
-.theme-dot.active{border-color:var(--gold);box-shadow:0 0 14px rgba(255,213,74,.7)}
+.theme-dot.active{border-color:var(--gold);box-shadow:0 0 12px rgba(255,213,74,.8)}
 .theme-dot[data-theme="green"]{background:linear-gradient(135deg,#1d7a45,#0a3a1e)}
 .theme-dot[data-theme="dark"]{background:linear-gradient(135deg,#1a1a2e,#16213e)}
 .theme-dot[data-theme="light"]{background:linear-gradient(135deg,#2e7d32,#1b5e20)}
-.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px}
-.stat-card{background:rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:16px 10px;text-align:center}
-.stat-card .num{font-size:28px;font-weight:900;color:var(--gold);text-shadow:0 2px 10px rgba(255,213,74,.3)}
-.stat-card .lbl{font-size:10px;opacity:.6;text-transform:uppercase;letter-spacing:1px;margin-top:3px}
+.theme-dot[data-theme="blue"]{background:linear-gradient(135deg,#1976d2,#0d47a1)}
+.theme-dot[data-theme="purple"]{background:linear-gradient(135deg,#8e24aa,#4a148c)}
+.theme-dot[data-theme="red"]{background:linear-gradient(135deg,#e53935,#b71c1c)}
+.theme-dot[data-theme="amber"]{background:linear-gradient(135deg,#ffb300,#b8860b)}
 
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+.stat-card{background:rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:14px 8px;text-align:center}
+.stat-card .num{font-size:26px;font-weight:900;color:var(--gold)}
+.stat-card .lbl{font-size:10px;opacity:.6;text-transform:uppercase;letter-spacing:1px;margin-top:2px}
+
+/* =====================================================
+   LANDSCAPE MODE (rotacionado via CSS ou físico)
+===================================================== */
+html.landscape-mode #menuScreen .menu-box{
+  max-width: 820px;padding: 18px 22px;
+}
+html.landscape-mode #menuScreen h1{
+  font-size: clamp(22px, 5vmin, 30px);margin-bottom: 2px;
+}
+html.landscape-mode #menuScreen .subtitle{
+  font-size: 9px;letter-spacing: 4px;margin-bottom: 12px;
+}
+html.landscape-mode .menu-buttons{
+  display: grid;grid-template-columns: 1fr 1fr;gap: 8px;
+}
+html.landscape-mode .menu-btn{
+  padding: 11px 12px;font-size: 13px;border-radius: 11px;
+}
+html.landscape-mode .settings-box,
+html.landscape-mode .stats-box{
+  max-width: 820px;padding: 18px 22px;
+}
+html.landscape-mode .settings-box h2,
+html.landscape-mode .stats-box h2{
+  font-size: 16px;margin-bottom: 10px;
+}
+html.landscape-mode .setting-row{
+  padding: 7px 0;font-size: 12px;
+}
+html.landscape-mode .setting-row select{
+  padding: 6px 8px;font-size: 11px;min-width: 80px;
+}
+html.landscape-mode .stats-grid{
+  grid-template-columns: repeat(4, 1fr);gap: 8px;margin-bottom: 12px;
+}
+html.landscape-mode .stat-card{padding: 10px 6px}
+html.landscape-mode .stat-card .num{font-size: 20px}
+html.landscape-mode .stat-card .lbl{font-size: 8px}
+html.landscape-mode .theme-dots{gap: 6px}
+html.landscape-mode .theme-dot{width: 24px;height: 24px}
+html.landscape-mode .menu-btn.primary{padding: 11px 12px;font-size: 13px}
+
+/* =====================================================
+   JOGO
+===================================================== */
 #gameScreen{position:relative;height:100%;width:100%;display:none}
 #gameScreen.show{display:block}
 #app{display:grid;grid-template-rows:auto auto minmax(0,1fr) auto auto;height:100%;width:100%}
@@ -142,8 +207,7 @@ body::before{
   display:flex;flex-direction:column;align-items:center;min-width:90px;
   padding:4px 14px;border-radius:12px;background:rgba(0,0,0,.35);
   border:1px solid rgba(255,255,255,.12);
-  transition:box-shadow .3s,transform .3s;
-  position:relative;
+  transition:box-shadow .3s;position:relative;
 }
 .score-box.active{box-shadow:0 0 0 2px var(--gold),0 0 22px rgba(255,213,74,.6)}
 .score-box.leading{border-color:var(--gold)}
@@ -152,11 +216,8 @@ body::before{
   font-size:16px;filter:drop-shadow(0 2px 4px rgba(0,0,0,.8));
 }
 .score-box .label{font-size:10px;letter-spacing:1.8px;text-transform:uppercase;opacity:.8}
-.score-box .score{font-size:22px;font-weight:900;color:var(--gold);text-shadow:0 2px 8px rgba(0,0,0,.7);line-height:1.1}
-.score-box .round-preview{
-  font-size:10px;font-weight:700;color:#8dffb0;margin-top:2px;
-  min-height:12px;letter-spacing:.3px;transition:color .3s;
-}
+.score-box .score{font-size:22px;font-weight:900;color:var(--gold);line-height:1.1}
+.score-box .round-preview{font-size:10px;font-weight:700;color:#8dffb0;margin-top:2px;min-height:12px}
 .score-box .round-preview.neg{color:#ff8a80}
 .score-box .round-preview.empty{opacity:0}
 
@@ -165,12 +226,11 @@ body::before{
 #targetInfo{font-size:10px;opacity:.55;margin-top:1px}
 .progress-track{
   height:5px;background:rgba(0,0,0,.4);border-radius:3px;
-  margin-top:6px;overflow:hidden;box-shadow:inset 0 1px 2px rgba(0,0,0,.5);
+  margin-top:6px;overflow:hidden;
 }
 .progress-fill{
   height:100%;background:linear-gradient(90deg,#ffcf3f,#ffe082);
   border-radius:3px;transition:width .6s cubic-bezier(.2,.9,.3,1);
-  box-shadow:0 0 8px rgba(255,213,74,.8);
 }
 
 section{min-height:0;display:flex;flex-direction:column;justify-content:center;padding:2px 8px}
@@ -182,7 +242,7 @@ section{min-height:0;display:flex;flex-direction:column;justify-content:center;p
 .meld-row::-webkit-scrollbar{height:5px}
 .meld-row::-webkit-scrollbar-thumb{background:rgba(255,255,255,.3);border-radius:5px}
 .meld{position:relative;flex:0 0 auto;animation:popIn .35s cubic-bezier(.2,1.4,.4,1)}
-.meld-cards{--cw:clamp(22px,8vmin,36px);display:flex}
+.meld-cards{--cw:clamp(26px, 9vmin, 44px);display:flex}
 .meld-cards .card:not(:first-child){margin-left:calc(var(--cw) * -0.5)}
 .meld.canasta .card{box-shadow:0 0 0 1.5px rgba(255,213,74,.9),0 0 14px rgba(255,213,74,.7),0 2px 8px rgba(0,0,0,.6)}
 .canasta-badge{
@@ -210,7 +270,7 @@ section{min-height:0;display:flex;flex-direction:column;justify-content:center;p
 .c-corner.br{bottom:5%;right:7%;transform:rotate(180deg)}
 .c-corner .r{font-size:calc(var(--cw)*.32);letter-spacing:-.5px}
 .c-corner .s{font-size:calc(var(--cw)*.26);margin-top:-1px}
-.c-center{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:calc(var(--cw)*.46);opacity:.9;text-shadow:0 1px 2px rgba(0,0,0,.1)}
+.c-center{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:calc(var(--cw)*.46);opacity:.9}
 .card.back{background:repeating-linear-gradient(45deg,#1a237e 0 4px,#283593 4px 8px);border:2px solid rgba(255,255,255,.95);box-shadow:0 2px 8px rgba(0,0,0,.6),inset 0 0 0 1px rgba(255,255,255,.2)}
 .card.back::after{content:'';position:absolute;inset:18%;border-radius:4px;border:1.5px solid rgba(255,255,255,.5);background:radial-gradient(circle,rgba(255,255,255,.2),transparent 70%)}
 
@@ -219,7 +279,7 @@ section{min-height:0;display:flex;flex-direction:column;justify-content:center;p
 .hand-row .card{cursor:pointer;position:relative}
 .hand-row .card:hover{transform:translateY(-12px);z-index:99!important;box-shadow:0 12px 22px rgba(0,0,0,.65)}
 .hand-row .card.selected{transform:translateY(-18px);z-index:120!important;box-shadow:0 0 0 3px var(--gold),0 0 26px rgba(255,213,74,.9),0 12px 24px rgba(0,0,0,.6)}
-.cpu-hand .card{--cw:clamp(22px,7vmin,34px);cursor:default}
+.cpu-hand .card{--cw:clamp(26px, 8vmin, 42px);cursor:default}
 .cpu-hand .card:hover{transform:none;box-shadow:0 2px 8px rgba(0,0,0,.55)}
 
 #tableCenter{
@@ -280,18 +340,18 @@ button.danger{background:linear-gradient(180deg,#ef5350,#b71c1c);border-color:#f
 #modal.show{opacity:1;pointer-events:auto}
 .modal-box{
   background:linear-gradient(160deg,#1b4a2a,#0a2414);
-  border:1px solid rgba(255,213,74,.4);border-radius:20px;padding:24px 22px;
-  max-width:min(480px,94vw);width:100%;text-align:center;
+  border:1px solid rgba(255,213,74,.4);border-radius:20px;padding:22px 20px;
+  max-width:min(500px,94vw);max-height:90vh;overflow-y:auto;width:100%;text-align:center;
   box-shadow:0 28px 80px rgba(0,0,0,.85),0 0 70px rgba(255,213,74,.15);
   transform:scale(.9);transition:transform .35s cubic-bezier(.2,1.4,.4,1);
 }
 #modal.show .modal-box{transform:scale(1)}
-.modal-box h2{font-size:22px;margin-bottom:16px;color:var(--gold);letter-spacing:.5px}
-.score-table{width:100%;border-collapse:collapse;font-size:13px;margin-bottom:16px}
-.score-table td{padding:7px 4px;border-bottom:1px solid rgba(255,255,255,.1)}
+.modal-box h2{font-size:22px;margin-bottom:14px;color:var(--gold)}
+.score-table{width:100%;border-collapse:collapse;font-size:13px;margin-bottom:14px}
+.score-table td{padding:6px 4px;border-bottom:1px solid rgba(255,255,255,.1)}
 .score-table td:first-child{text-align:left;opacity:.85}
 .score-table td:last-child{text-align:right;font-weight:800}
-.score-table tr.total td{border-bottom:none;font-size:15px;color:var(--gold);padding-top:12px}
+.score-table tr.total td{border-bottom:none;font-size:15px;color:var(--gold);padding-top:10px}
 .pos{color:#7dffab}.neg{color:#ff8a80}
 
 @keyframes popIn{from{transform:scale(.6) translateY(16px);opacity:0}to{transform:scale(1) translateY(0);opacity:1}}
@@ -302,27 +362,33 @@ button.danger{background:linear-gradient(180deg,#ef5350,#b71c1c);border-color:#f
 .confetti{position:fixed;width:10px;height:10px;pointer-events:none;z-index:940;animation:confFall linear forwards}
 @keyframes confFall{to{transform:translateY(108vh) rotate(720deg);opacity:.1}}
 
-@media (orientation: landscape) and (max-height: 550px){
-  #hud{padding:4px 8px}
-  .score-box{min-width:70px;padding:2px 8px}
-  .score-box .score{font-size:17px}
+/* Landscape físico (celular deitado) */
+@media (orientation: landscape) and (max-height: 600px){
+  #hud{padding:4px 8px;gap:6px}
+  .score-box{min-width:66px;padding:2px 8px}
+  .score-box .score{font-size:16px}
   .score-box .label{font-size:9px;letter-spacing:1px}
   .score-box .round-preview{font-size:9px}
   #roundInfo{font-size:11px}
   #targetInfo{font-size:9px}
   .progress-track{height:4px;margin-top:4px}
   section{padding:1px 4px}
-  .meld-row{min-height:calc(var(--ch)*.55);padding:3px 2px;gap:8px}
-  .hand-row{min-height:calc(var(--ch) + 8px);padding:4px 4px 2px}
-  #controls{padding:4px 4px calc(4px + env(safe-area-inset-bottom));gap:5px}
-  button{padding:7px 11px;font-size:11px;border-radius:9px}
-  #tableCenter{gap:14px}
+  .meld-row{min-height:calc(var(--ch)*.5);padding:3px 2px;gap:8px}
+  .hand-row{min-height:calc(var(--ch) + 6px);padding:4px 4px 2px}
+  #controls{padding:5px 5px calc(5px + env(safe-area-inset-bottom));gap:6px}
+  button{padding:8px 12px;font-size:11.5px;border-radius:9px}
+  #tableCenter{gap:18px}
   .status-msg{font-size:11px;max-width:38vw}
   .pile{padding:4px}
+  .modal-box{padding:16px 14px;max-width:600px}
+  .modal-box h2{font-size:18px;margin-bottom:10px}
+  .score-table{font-size:11px;margin-bottom:10px}
+  .score-table td{padding:4px 3px}
+  .score-table tr.total td{font-size:13px;padding-top:6px}
 }
 @media (max-height: 380px){
-  .meld-row{min-height:calc(var(--ch)*.5)}
-  .hand-row{min-height:calc(var(--ch) + 4px);padding:3px 3px 2px}
+  .meld-row{min-height:calc(var(--ch)*.45)}
+  .hand-row{min-height:calc(var(--ch) + 2px);padding:3px 3px 2px}
   #hud{padding:3px 6px}
   button{padding:6px 10px;font-size:10.5px}
 }
@@ -338,10 +404,12 @@ button.danger{background:linear-gradient(180deg,#ef5350,#b71c1c);border-color:#f
     <div class="menu-box">
       <h1>CANASTRA_MS</h1>
       <div class="subtitle">Edição Profissional</div>
-      <button class="menu-btn primary" id="btnPlayOpen">🎴 Canastra Aberta (vs CPU)</button>
-      <button class="menu-btn primary" id="btnPlay4p">👥 Canastra em Duplas (2v2)</button>
-      <button class="menu-btn" id="btnSettings">⚙️ Configurações</button>
-      <button class="menu-btn" id="btnStats">📊 Estatísticas</button>
+      <div class="menu-buttons">
+        <button class="menu-btn primary" id="btnPlayOpen">🎴 Canastra Aberta (vs CPU)</button>
+        <button class="menu-btn primary" id="btnPlay4p">👥 Canastra em Duplas (2v2)</button>
+        <button class="menu-btn" id="btnSettings">⚙️ Configurações</button>
+        <button class="menu-btn" id="btnStats">📊 Estatísticas</button>
+      </div>
     </div>
   </div>
 
@@ -361,15 +429,19 @@ button.danger{background:linear-gradient(180deg,#ef5350,#b71c1c);border-color:#f
         <label>Som</label>
         <input type="checkbox" id="settingSound" checked style="width:20px;height:20px;accent-color:var(--gold)">
       </div>
-      <div class="setting-row">
-        <label>Tema</label>
+      <div class="setting-row" style="flex-direction:column;align-items:flex-start;gap:8px">
+        <label style="margin-bottom:4px">Tema de fundo</label>
         <div class="theme-dots">
-          <div class="theme-dot active" data-theme="green" onclick="setTheme('green')"></div>
-          <div class="theme-dot" data-theme="dark" onclick="setTheme('dark')"></div>
-          <div class="theme-dot" data-theme="light" onclick="setTheme('light')"></div>
+          <div class="theme-dot active" data-theme="green" onclick="setTheme('green')" title="Verde"></div>
+          <div class="theme-dot" data-theme="light" onclick="setTheme('light')" title="Verde Claro"></div>
+          <div class="theme-dot" data-theme="dark" onclick="setTheme('dark')" title="Escuro"></div>
+          <div class="theme-dot" data-theme="blue" onclick="setTheme('blue')" title="Azul"></div>
+          <div class="theme-dot" data-theme="purple" onclick="setTheme('purple')" title="Roxo"></div>
+          <div class="theme-dot" data-theme="red" onclick="setTheme('red')" title="Vermelho"></div>
+          <div class="theme-dot" data-theme="amber" onclick="setTheme('amber')" title="Âmbar"></div>
         </div>
       </div>
-      <button class="menu-btn primary" id="btnCloseSettings" style="margin-top:20px">Voltar</button>
+      <button class="menu-btn primary" id="btnCloseSettings" style="margin-top:16px">Voltar</button>
     </div>
   </div>
 
@@ -382,7 +454,7 @@ button.danger{background:linear-gradient(180deg,#ef5350,#b71c1c);border-color:#f
         <div class="stat-card"><div class="num" id="statCanastas">0</div><div class="lbl">Canastras</div></div>
         <div class="stat-card"><div class="num" id="statGames">0</div><div class="lbl">Partidas</div></div>
       </div>
-      <button class="menu-btn" id="btnResetStats" style="margin-bottom:10px">🗑️ Resetar</button>
+      <button class="menu-btn" id="btnResetStats" style="margin-bottom:8px">🗑️ Resetar</button>
       <button class="menu-btn primary" id="btnCloseStats">Voltar</button>
     </div>
   </div>
@@ -450,24 +522,64 @@ button.danger{background:linear-gradient(180deg,#ef5350,#b71c1c);border-color:#f
 
 <script>
 /* =====================================================
-   DETECÇÃO DE PLATAFORMA
+   DETECÇÃO DE PLATAFORMA + LANDSCAPE MODE
 ===================================================== */
 const IS_MOBILE = document.documentElement.classList.contains('is-mobile');
 const IS_IOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 
+function updateLandscapeMode(){
+  const physicalLandscape = window.matchMedia('(orientation: landscape)').matches && window.innerHeight < 600;
+  const rotatedMobile = IS_MOBILE && window.matchMedia('(orientation: portrait)').matches;
+  document.documentElement.classList.toggle('landscape-mode', physicalLandscape || rotatedMobile);
+}
+updateLandscapeMode();
+window.addEventListener('resize', updateLandscapeMode);
+window.addEventListener('orientationchange', () => setTimeout(updateLandscapeMode, 100));
+
+/* =====================================================
+   FULLSCREEN + ORIENTATION LOCK
+===================================================== */
 let orientationAttempted = false;
-async function tryLockOrientation(){
-  if (orientationAttempted || !IS_MOBILE) return;
+async function tryLockOrientation(force=false){
+  if (!IS_MOBILE) return;
+  if (orientationAttempted && !force) return;
   orientationAttempted = true;
   try {
     const el = document.documentElement;
-    if (el.requestFullscreen) await el.requestFullscreen().catch(()=>{});
-    else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
-    if (screen.orientation && typeof screen.orientation.lock === 'function') await screen.orientation.lock('landscape');
-    else if (screen.lockOrientation) screen.lockOrientation('landscape');
+    if (el.requestFullscreen && !document.fullscreenElement) {
+      await el.requestFullscreen().catch(()=>{});
+    } else if (el.webkitRequestFullscreen && !document.webkitFullscreenElement) {
+      el.webkitRequestFullscreen();
+    }
+    if (screen.orientation && typeof screen.orientation.lock === 'function') {
+      await screen.orientation.lock('landscape').catch(()=>{});
+    } else if (screen.lockOrientation) {
+      screen.lockOrientation('landscape');
+    } else if (screen.mozLockOrientation) {
+      screen.mozLockOrientation('landscape');
+    }
   } catch(e) {}
 }
-function onFirstInteraction(){ if(IS_MOBILE) tryLockOrientation(); }
+
+function tryAutoFullscreen(){
+  if (!IS_MOBILE) return;
+  if (document.fullscreenElement || document.webkitFullscreenElement) return;
+  const isLandscape = window.matchMedia('(orientation: landscape)').matches;
+  if (!isLandscape) return;
+  try {
+    const el = document.documentElement;
+    const p = el.requestFullscreen ? el.requestFullscreen() :
+              el.webkitRequestFullscreen ? el.webkitRequestFullscreen() : null;
+    if (p && p.catch) p.catch(()=>{});
+  } catch(e) {}
+}
+
+function onFirstInteraction(){
+  if (IS_MOBILE) {
+    tryLockOrientation();
+    tryAutoFullscreen();
+  }
+}
 document.addEventListener('touchstart', onFirstInteraction, { once: true, passive: true });
 document.addEventListener('click', onFirstInteraction, { once: true });
 
@@ -610,21 +722,15 @@ function newGame(mode){
     phase: 'draw', round: 1, selected: new Set(),
     busy: false, busySince: 0, mode, target: settings.target
   };
-
   if(mode === '4p'){
     G.players = {
-      human: newPlayerState('human', 'A'),
-      partner: newPlayerState('partner', 'A'),
-      opp1: newPlayerState('opp1', 'B'),
-      opp2: newPlayerState('opp2', 'B')
+      human: newPlayerState('human','A'), partner: newPlayerState('partner','A'),
+      opp1: newPlayerState('opp1','B'), opp2: newPlayerState('opp2','B')
     };
-    G.turnOrder = ['human', 'opp1', 'partner', 'opp2'];
+    G.turnOrder = ['human','opp1','partner','opp2'];
   } else {
-    G.players = {
-      human: newPlayerState('human', 'A'),
-      cpu: newPlayerState('cpu', 'B')
-    };
-    G.turnOrder = ['human', 'cpu'];
+    G.players = { human: newPlayerState('human','A'), cpu: newPlayerState('cpu','B') };
+    G.turnOrder = ['human','cpu'];
   }
   startRound(true);
 }
@@ -633,11 +739,7 @@ function startRound(first){
   G.stock = shuffle(makeDeck());
   G.discard = []; G.mortos = [];
   G.mortoTaken = { A:false, B:false };
-  G.selected.clear();
-  G.turnIndex = 0;
-  G.phase = 'draw';
-  G.busy = false;
-  G.busySince = 0;
+  G.selected.clear(); G.turnIndex = 0; G.phase = 'draw'; G.busy = false; G.busySince = 0;
 
   for(const k in G.players){
     const p = G.players[k];
@@ -675,16 +777,16 @@ function dealAnimation(){
    REGRAS
 ===================================================== */
 function validateMeld(p, cards){
-  if(!cards.length) return { ok:false, msg:'Selecione cartas para melar.' };
+  if(!cards.length) return { ok:false, msg:'Selecione cartas.' };
   const wilds = cards.filter(c=>c.wild);
   const nats = cards.filter(c=>!c.wild);
-  if(!nats.length) return { ok:false, msg:'Uma sequência precisa de cartas naturais.' };
+  if(!nats.length) return { ok:false, msg:'Precisa de naturais.' };
   const suit = nats[0].suit;
-  if(nats.some(c=>c.suit !== suit)) return { ok:false, msg:'Todas as naturais devem ser do mesmo naipe.' };
+  if(nats.some(c=>c.suit !== suit)) return { ok:false, msg:'Mesmo naipe.' };
 
   const sorted = nats.slice().sort((a,b)=>RANK_ORDER[a.rank] - RANK_ORDER[b.rank]);
   for(let i=1;i<sorted.length;i++){
-    if(RANK_ORDER[sorted[i].rank] <= RANK_ORDER[sorted[i-1].rank]) return { ok:false, msg:'Sequência em ordem crescente.' };
+    if(RANK_ORDER[sorted[i].rank] <= RANK_ORDER[sorted[i-1].rank]) return { ok:false, msg:'Ordem crescente.' };
   }
 
   const existing = p.melds.find(m=>m.suit === suit);
@@ -692,7 +794,7 @@ function validateMeld(p, cards){
   const totalWild = wilds.length + (existing ? existing.wildCount : 0);
   const totalCards = totalNat + totalWild;
 
-  if(totalCards < 3) return { ok:false, msg:'Mínimo 3 cartas.' };
+  if(totalCards < 3) return { ok:false, msg:'Mín. 3 cartas.' };
   if(totalWild > 2) return { ok:false, msg:'Máx 2 curingas.' };
   if(totalWild > totalNat) return { ok:false, msg:'Curingas > naturais.' };
 
@@ -708,12 +810,12 @@ function canastaBonus(meld){
   if(!meld.canasta) return 0;
   if(meld.wildCount === 0){
     if(meld.cards.length >= 14){
-      const first = meld.cards[0], last = meld.cards[meld.cards.length-1];
-      if(first.rank === 'A' && last.rank === 'A') return 1000;
+      const f = meld.cards[0], l = meld.cards[meld.cards.length-1];
+      if(f.rank === 'A' && l.rank === 'A') return 1000;
     }
     if(meld.cards.length >= 13){
-      const first = meld.cards[0], last = meld.cards[meld.cards.length-1];
-      if(first.rank === 'A' && last.rank === 'K') return 500;
+      const f = meld.cards[0], l = meld.cards[meld.cards.length-1];
+      if(f.rank === 'A' && l.rank === 'K') return 500;
     }
     return 200;
   }
@@ -721,26 +823,23 @@ function canastaBonus(meld){
 }
 
 /* =====================================================
-   HELPERS DE PONTUAÇÃO
+   PONTUAÇÃO
 ===================================================== */
 function getMeldPoints(p){
-  let total = 0;
-  for(const m of p.melds){
-    total += m.cards.reduce((s,c)=>s + c.value, 0);
-    total += canastaBonus(m);
-  }
-  return total;
+  let t = 0;
+  for(const m of p.melds){ t += m.cards.reduce((s,c)=>s+c.value,0); t += canastaBonus(m); }
+  return t;
 }
-function getHandPoints(p){ return p.hand.reduce((s,c)=>s + c.value, 0); }
+function getHandPoints(p){ return p.hand.reduce((s,c)=>s+c.value, 0); }
 function getTeamScore(team){
-  let total = 0;
-  for(const k in G.players) if(G.players[k].team === team) total += G.players[k].score;
-  return total;
+  let t = 0;
+  for(const k in G.players) if(G.players[k].team === team) t += G.players[k].score;
+  return t;
 }
 function getTeamMeldPoints(team){
-  let total = 0;
-  for(const k in G.players) if(G.players[k].team === team) total += getMeldPoints(G.players[k]);
-  return total;
+  let t = 0;
+  for(const k in G.players) if(G.players[k].team === team) t += getMeldPoints(G.players[k]);
+  return t;
 }
 
 /* =====================================================
@@ -769,7 +868,7 @@ function commitMeld(p, cards, suit, silent){
     saveStats();
     const mx = window.innerWidth/2, my = window.innerHeight/2;
     const bonus = canastaBonus(meld);
-    const label = bonus === 1000 ? 'CANASTRA DE 1000!' : bonus === 500 ? 'CANASTRA DE 500!' : (meld.wildCount === 0 ? 'CANASTRA LIMPA! +200' : 'CANASTRA SUJA! +100');
+    const label = bonus === 1000 ? 'CANASTRA 1000!' : bonus === 500 ? 'CANASTRA 500!' : (meld.wildCount === 0 ? 'CANASTRA LIMPA! +200' : 'CANASTRA SUJA! +100');
     floatPoints(mx-60, my, label);
     confettiBurst(75);
     sfxCanasta();
@@ -826,13 +925,13 @@ function discardCard(p, card){
 }
 
 /* =====================================================
-   TURNO HUMANO
+   HUMANO
 ===================================================== */
 function humanDraw(){
   if(!isHumanTurn() || G.phase !== 'draw' || G.busy) return;
   if(!G.stock.length){
     if(canTakeDiscard(G.players.human)){ toast('O monte acabou. Pegue o lixo!', true); return; }
-    endRound(null, 'O monte acabou e ninguém pode pegar o lixo!');
+    endRound(null, 'O monte acabou!');
     return;
   }
   G.busy = true;
@@ -840,7 +939,7 @@ function humanDraw(){
   G.phase = 'action';
   render();
   G.busy = false;
-  if(G.stock.length === 0) toast('O monte acabou — última rodada!');
+  if(G.stock.length === 0) toast('Monte acabou — última rodada!');
 }
 
 function humanTakeDiscard(){
@@ -869,7 +968,7 @@ function humanDiscard(){
   if(!isHumanTurn() || G.phase !== 'action' || G.busy) return;
   const p = G.players.human;
   const sel = p.hand.filter(c => G.selected.has(c.id));
-  if(sel.length !== 1){ sfxError(); toast('Selecione exatamente 1 carta.', true); return; }
+  if(sel.length !== 1){ sfxError(); toast('Selecione 1 carta.', true); return; }
 
   const card = sel[0];
   const willEmpty = (p.hand.length === 1);
@@ -881,11 +980,11 @@ function humanDiscard(){
     const hasOtherMoves = G.stock.length > 0 || canTakeDiscard(p);
     if(hasOtherMoves){
       sfxError();
-      if(!hasCanastraLimpa) toast('Precisa de CANASTRA LIMPA para bater!', true);
-      else toast('Precisa do MORTO para bater!', true);
+      if(!hasCanastraLimpa) toast('Precisa de CANASTRA LIMPA!', true);
+      else toast('Precisa do MORTO!', true);
       return;
     }
-    toast('Sem mais jogadas — descarte forçado.', true);
+    toast('Sem jogadas — descarte forçado.', true);
   }
 
   discardCard(p, card);
@@ -894,10 +993,9 @@ function humanDiscard(){
   if(p.hand.length === 0){
     if(!G.mortoTaken[p.team]){ takeMorto(p); render(); endTurn(); return; }
     if(canWin) endRound(p.team, 'Você bateu! 🎉');
-    else endRound(null, 'Você ficou sem cartas sem bater.');
+    else endRound(null, 'Ficou sem cartas sem bater.');
     return;
   }
-
   render();
   endTurn();
 }
@@ -915,13 +1013,9 @@ function takeMorto(p){
 }
 
 /* =====================================================
-   TURNO DOS BOTS — REESCRITO
+   BOT
 ===================================================== */
-
-function setBusy(val){
-  G.busy = val;
-  G.busySince = val ? Date.now() : 0;
-}
+function setBusy(val){ G.busy = val; G.busySince = val ? Date.now() : 0; }
 
 function endTurn(){
   G.turnIndex = (G.turnIndex + 1) % G.turnOrder.length;
@@ -936,144 +1030,80 @@ function endTurn(){
     endRound(null, 'O monte acabou!');
     return;
   }
-
   if(current !== 'human' && !G.busy) setTimeout(() => botTurnSafe(current), 350);
 }
 
-/**
- * Envolve botTurn em try/catch para garantir que G.busy nunca fique travado.
- */
 async function botTurnSafe(playerId){
   if(!G || G.phase === 'end') return;
   if(G.busy){
-    // Se está ocupado há muito tempo, recupera
-    if(G.busySince && Date.now() - G.busySince > 4000){
-      console.warn('[Canastra] Recuperando de estado travado');
-      setBusy(false);
-    } else {
-      return;
-    }
+    if(G.busySince && Date.now() - G.busySince > 4000) setBusy(false);
+    else return;
   }
   setBusy(true);
   try {
     await botTurn(playerId);
   } catch(e){
-    console.error('[Canastra] Erro no turno do bot:', e);
-    // Fallback: descarta uma carta e passa vez
+    console.error('[Bot] Erro:', e);
     try {
       const p = G.players[playerId];
-      if(p && p.hand.length > 0 && G.phase !== 'end'){
-        discardCard(p, p.hand[0]);
-        render();
-      }
-    } catch(e2){ console.error('[Canastra] Fallback falhou:', e2); }
+      if(p && p.hand.length > 0 && G.phase !== 'end'){ discardCard(p, p.hand[0]); render(); }
+    } catch(e2){ console.error(e2); }
     setBusy(false);
-    if(G.phase !== 'end'){
-      try { endTurn(); } catch(e3){ console.error(e3); }
-    }
+    if(G.phase !== 'end'){ try { endTurn(); } catch(e3){ console.error(e3); } }
   }
 }
 
 async function botTurn(playerId){
   const p = G.players[playerId];
-  if(!p) { setBusy(false); return; }
-
+  if(!p){ setBusy(false); return; }
   render();
   await sleep(250);
 
-  // === 1. COMPRAR ===
-  if(!G.stock.length && !canTakeDiscard(p)){
-    setBusy(false);
-    endRound(null, 'O monte acabou!');
-    return;
-  }
+  if(!G.stock.length && !canTakeDiscard(p)){ setBusy(false); endRound(null, 'O monte acabou!'); return; }
 
   if(canTakeDiscard(p) && G.discard.length >= 1){
-    doTakeDiscard(p);
-    toast(getPlayerName(p) + ' pegou o lixo!');
-    render();
-    await sleep(300);
+    doTakeDiscard(p); toast(getPlayerName(p) + ' pegou o lixo!'); render(); await sleep(300);
   } else if(G.stock.length > 0){
-    drawFromStock(p, Math.min(2, G.stock.length));
-    render();
-    await sleep(300);
+    drawFromStock(p, Math.min(2, G.stock.length)); render(); await sleep(300);
   } else {
-    setBusy(false);
-    endRound(null, 'O monte acabou!');
-    return;
+    setBusy(false); endRound(null, 'O monte acabou!'); return;
   }
 
-  // === 2. MELAR ===
   let plan = [];
-  try {
-    plan = botPlanMelds(p);
-  } catch(e){
-    console.error('[Canastra] botPlanMelds falhou:', e);
-    plan = [];
-  }
-
+  try { plan = botPlanMelds(p); } catch(e){ console.error(e); plan = []; }
   for(const pl of plan){
     if(G.phase === 'end') return;
     commitMeld(p, pl.cards, pl.suit, true);
     render();
     await sleep(150);
   }
-  if(plan.length){
-    p.hasMelded = true;
-    sfxMeld();
-    await sleep(150);
-  }
+  if(plan.length){ p.hasMelded = true; sfxMeld(); await sleep(150); }
 
-  // === 3. VERIFICA SE ESVAZIOU (raro, mas possível) ===
   if(p.hand.length === 0){
-    if(!G.mortoTaken[p.team] && G.mortos.length > 0){
-      takeMorto(p);
-      render();
-      await sleep(250);
-    }
-    if(p.hand.length === 0){
-      // Não conseguiu pegar morto e está vazio — encerra
-      setBusy(false);
-      endRound(null, getPlayerName(p) + ' ficou sem cartas.');
-      return;
-    }
+    if(!G.mortoTaken[p.team] && G.mortos.length > 0){ takeMorto(p); render(); await sleep(250); }
+    if(p.hand.length === 0){ setBusy(false); endRound(null, getPlayerName(p) + ' sem cartas.'); return; }
   }
 
-  // === 4. DESCARTAR ===
   const hasCanastraLimpa = p.melds.some(m => m.canastra && m.wildCount === 0);
   const mortoPego = G.mortoTaken[p.team];
   const canWin = hasCanastraLimpa && mortoPego;
-  const willEmpty = (p.hand.length === 1);
 
   let card;
-  try {
-    card = botChooseDiscard(p);
-  } catch(e){
-    card = p.hand[0];
-  }
+  try { card = botChooseDiscard(p); } catch(e){ card = p.hand[0]; }
   if(!card) card = p.hand[0];
 
-  if(card){
-    discardCard(p, card);
-    render();
-    await sleep(300);
-  }
+  if(card){ discardCard(p, card); render(); await sleep(300); }
 
-  // === 5. PEGA MORTO SE ESVAZIOU ===
   if(p.hand.length === 0 && !G.mortoTaken[p.team] && G.mortos.length > 0){
-    takeMorto(p);
-    render();
-    await sleep(250);
+    takeMorto(p); render(); await sleep(250);
   }
 
-  // === 6. VERIFICA VITÓRIA / FIM ===
   if(p.hand.length === 0){
     setBusy(false);
     if(canWin) endRound(p.team, getPlayerName(p) + ' bateu! 🏆');
-    else endRound(null, getPlayerName(p) + ' ficou sem cartas.');
+    else endRound(null, getPlayerName(p) + ' sem cartas.');
     return;
   }
-
   setBusy(false);
   endTurn();
 }
@@ -1086,15 +1116,9 @@ function getPlayerName(p){
   return 'CPU';
 }
 
-/**
- * Planeja melds SEM SOBREPOSIÇÃO de cartas.
- * Usa Set de IDs para garantir que cada carta apareça em apenas 1 meld.
- */
 function botPlanMelds(p){
   const plan = [];
   const usedIds = new Set();
-
-  // Separar por naipe
   const bySuit = {};
   const wilds = [];
   for(const c of p.hand){
@@ -1102,7 +1126,6 @@ function botPlanMelds(p){
     else (bySuit[c.suit] = bySuit[c.suit] || []).push(c);
   }
 
-  // === FASE 1: sequências naturais 3+ ===
   for(const suit in bySuit){
     const cards = bySuit[suit].sort((a,b)=>RANK_ORDER[a.rank] - RANK_ORDER[b.rank]);
     let run = [];
@@ -1115,25 +1138,17 @@ function botPlanMelds(p){
     };
     for(const card of cards){
       if(usedIds.has(card.id)) continue;
-      if(run.length === 0){
-        run.push(card);
-      } else if(RANK_ORDER[card.rank] === RANK_ORDER[run[run.length-1].rank] + 1){
-        run.push(card);
-      } else {
-        flushRun();
-        run.push(card);
-      }
+      if(run.length === 0) run.push(card);
+      else if(RANK_ORDER[card.rank] === RANK_ORDER[run[run.length-1].rank] + 1) run.push(card);
+      else { flushRun(); run.push(card); }
     }
     flushRun();
   }
 
-  // === FASE 2: usar curingas para completar pares ===
   let wildIdx = 0;
   for(const suit in bySuit){
     if(wildIdx >= wilds.length) break;
-    const cards = bySuit[suit]
-      .filter(c => !usedIds.has(c.id))
-      .sort((a,b)=>RANK_ORDER[a.rank] - RANK_ORDER[b.rank]);
+    const cards = bySuit[suit].filter(c => !usedIds.has(c.id)).sort((a,b)=>RANK_ORDER[a.rank] - RANK_ORDER[b.rank]);
     for(let i=0;i<cards.length-1 && wildIdx < wilds.length;i++){
       if(usedIds.has(cards[i].id) || usedIds.has(cards[i+1].id)) continue;
       const test = [cards[i], cards[i+1], wilds[wildIdx]];
@@ -1144,36 +1159,14 @@ function botPlanMelds(p){
       }
     }
   }
-
-  // === FASE 3: extensões em melds existentes ===
-  for(const meld of p.melds){
-    if(usedIds.size >= p.hand.length) break;
-    const sameSuit = p.hand.filter(c => !c.wild && c.suit === meld.suit && !usedIds.has(c.id));
-    for(const card of sameSuit){
-      const test = [card];
-      if(validateMeld(p, test).ok){
-        plan.push({ suit: meld.suit, cards: test });
-        usedIds.add(card.id);
-      }
-    }
-  }
-
   return plan;
 }
 
-/**
- * Escolha de descarte inteligente:
- * - Penaliza cartas que formam pares potenciais
- * - Penaliza cartas do mesmo naipe que melds existentes
- * - Prefere descartar cartas isoladas e de alto valor
- * - Nunca descarta curingas (a não ser que só tenha eles)
- */
 function botChooseDiscard(p){
   if(p.hand.length === 0) return null;
   if(p.hand.length === 1) return p.hand[0];
 
-  const counts = {};
-  const suitCounts = {};
+  const counts = {}, suitCounts = {};
   for(const c of p.hand){
     if(!c.wild){
       counts[c.rank] = (counts[c.rank] || 0) + 1;
@@ -1183,43 +1176,20 @@ function botChooseDiscard(p){
 
   let best = null, bestScore = -Infinity;
   for(const c of p.hand){
-    let score = 0;
-
-    if(c.wild){
-      // Curingas são muito valiosos, nunca descartar
-      score = -1000;
-    } else {
-      // Bônus por estar isolado (bom para descartar)
-      const rankCount = counts[c.rank] || 1;
-      score += (5 - rankCount) * 10; // quanto mais isolado, melhor descartar
-
-      // Bônus por naipe com poucas cartas (bom descartar)
-      const suitCount = suitCounts[c.suit] || 1;
-      score += (8 - suitCount) * 5;
-
-      // Penalidade se há meld do mesmo naipe (pode estender)
-      if(p.melds.some(m => m.suit === c.suit)) score -= 100;
-
-      // Penalidade por alto valor (perder pontos se pegar de volta)
-      score -= c.value * 0.5;
-
-      // Penalidade se forma par com carta adjacente (potencial sequência)
-      const hasAdjacent = p.hand.some(o =>
-        o.id !== c.id && !o.wild && o.suit === c.suit &&
-        Math.abs(RANK_ORDER[o.rank] - RANK_ORDER[c.rank]) === 1
-      );
-      if(hasAdjacent) score -= 30;
-
-      // Bônus se for carta alta isolada
-      if(rankCount === 1 && suitCount === 1) score += 20;
+    let s = 0;
+    if(c.wild){ s = -1000; }
+    else {
+      const rc = counts[c.rank] || 1;
+      const sc = suitCounts[c.suit] || 1;
+      s += (5 - rc) * 10 + (8 - sc) * 5;
+      if(p.melds.some(m => m.suit === c.suit)) s -= 100;
+      s -= c.value * 0.5;
+      const hasAdj = p.hand.some(o => o.id !== c.id && !o.wild && o.suit === c.suit && Math.abs(RANK_ORDER[o.rank] - RANK_ORDER[c.rank]) === 1);
+      if(hasAdj) s -= 30;
+      if(rc === 1 && sc === 1) s += 20;
     }
-
-    if(score > bestScore){
-      bestScore = score;
-      best = c;
-    }
+    if(s > bestScore){ bestScore = s; best = c; }
   }
-
   return best || p.hand[0];
 }
 
@@ -1243,17 +1213,14 @@ function endRound(winningTeam, reason){
     const outBonus = (p.team === winningTeam) ? 100 : 0;
     const mortoPenalty = G.mortoTaken[p.team] ? 0 : -100;
     const total = meldPts + canPts - handPts + outBonus + mortoPenalty;
-
     results[k] = { name: getPlayerName(p), meldPts, canPts, handPts, outBonus, mortoPenalty, total, team: p.team };
     roundScores[p.team] += total;
     p.score += total;
   }
 
   stats.games++;
-  if(winningTeam === 'A') stats.wins++;
-  else stats.losses++;
+  if(winningTeam === 'A') stats.wins++; else stats.losses++;
   saveStats();
-
   render();
 
   if(winningTeam === 'A'){ confettiBurst(130); sfxWin(); }
@@ -1272,34 +1239,30 @@ function showRoundModal(res, roundScores, winningTeam, reason){
     if(totalA > totalB) title = '🏆 Você Venceu!';
     else if(totalB > totalA) title = '😖 A CPU Venceu';
     else title = '🤝 Empate!';
-  } else {
-    title = 'Fim da Rodada ' + G.round;
-  }
+  } else title = 'Fim da Rodada ' + G.round;
   $('modalTitle').textContent = title;
 
   const fmt = n => (n >= 0 ? '+' : '') + n;
   const cls = n => n >= 0 ? 'pos' : 'neg';
 
-  let html = '<div style="font-size:12px;opacity:.75;margin-bottom:14px">' + reason + '</div>';
+  let html = '<div style="font-size:12px;opacity:.75;margin-bottom:12px">' + reason + '</div>';
   html += '<table class="score-table">';
-
   const order = G.mode === '4p' ? ['human','partner','opp1','opp2'] : ['human','cpu'];
   for(const k of order){
     const r = res[k];
-    html += '<tr><td colspan="2" style="font-weight:800;color:#ffd54a;padding-bottom:5px">' + r.name + '</td></tr>';
+    html += '<tr><td colspan="2" style="font-weight:800;color:#ffd54a;padding-bottom:4px">' + r.name + '</td></tr>';
     html += '<tr><td>Melas</td><td class="' + cls(r.meldPts) + '">' + fmt(r.meldPts) + '</td></tr>';
     if(r.canPts) html += '<tr><td>Canastras</td><td class="pos">' + fmt(r.canPts) + '</td></tr>';
     html += '<tr><td>Mão</td><td class="' + cls(-r.handPts) + '">' + fmt(-r.handPts) + '</td></tr>';
     if(r.outBonus) html += '<tr><td>Batida</td><td class="pos">+100</td></tr>';
     if(r.mortoPenalty) html += '<tr><td>Morto não pego</td><td class="neg">-100</td></tr>';
-    html += '<tr class="total"><td>Total da rodada</td><td class="' + cls(r.total) + '">' + fmt(r.total) + '</td></tr>';
-    html += '<tr><td colspan="2" style="height:8px"></td></tr>';
+    html += '<tr class="total"><td>Total rodada</td><td class="' + cls(r.total) + '">' + fmt(r.total) + '</td></tr>';
+    html += '<tr><td colspan="2" style="height:6px"></td></tr>';
   }
-
   html += '<tr class="total"><td>PLACAR ACUMULADO</td><td>' + totalA + ' × ' + totalB + '</td></tr>';
   if(!isGameOver){
     const falta = Math.min(G.target - totalA, G.target - totalB);
-    html += '<tr><td colspan="2" style="text-align:center;font-size:11px;opacity:.7;padding-top:8px">Faltam ' + falta + ' pts para a meta</td></tr>';
+    html += '<tr><td colspan="2" style="text-align:center;font-size:11px;opacity:.7;padding-top:6px">Faltam ' + falta + ' pts</td></tr>';
   }
   html += '</table>';
 
@@ -1353,7 +1316,6 @@ function toggleSelect(id){
 
 function render(){
   if(!G) return;
-
   const totalA = getTeamScore('A');
   const totalB = getTeamScore('B');
 
@@ -1362,69 +1324,56 @@ function render(){
   $('roundInfo').textContent = 'Rodada ' + G.round;
   $('targetInfo').textContent = 'Meta: ' + G.target + ' pontos';
 
-  const previewA = getTeamMeldPoints('A');
-  const previewB = getTeamMeldPoints('B');
+  const pA = getTeamMeldPoints('A');
+  const pB = getTeamMeldPoints('B');
+  const hP = $('humanRoundPreview');
+  hP.textContent = pA > 0 ? '+' + pA + ' pts' : '—';
+  hP.classList.toggle('empty', pA === 0);
+  const cP = $('cpuRoundPreview');
+  cP.textContent = pB > 0 ? '+' + pB + ' pts' : '—';
+  cP.classList.toggle('empty', pB === 0);
 
-  const hPreview = $('humanRoundPreview');
-  hPreview.textContent = previewA > 0 ? '+' + previewA + ' pts' : '—';
-  hPreview.classList.toggle('empty', previewA === 0);
-
-  const cPreview = $('cpuRoundPreview');
-  cPreview.textContent = previewB > 0 ? '+' + previewB + ' pts' : '—';
-  cPreview.classList.toggle('empty', previewB === 0);
-
-  const progress = Math.max(0, Math.min(100, (totalA / G.target) * 100));
-  $('progressFill').style.width = progress + '%';
-
+  $('progressFill').style.width = Math.max(0, Math.min(100, (totalA / G.target) * 100)) + '%';
   $('humanBox').classList.toggle('leading', totalA > totalB && G.round > 1);
   $('cpuBox').classList.toggle('leading', totalB > totalA && G.round > 1);
   $('humanBox').classList.toggle('active', isHumanTurn());
   $('cpuBox').classList.toggle('active', !isHumanTurn());
 
-  renderHands();
-  renderMelds();
-  renderPiles();
-  updateStatus();
-  updateButtons();
+  renderHands(); renderMelds(); renderPiles();
+  updateStatus(); updateButtons();
   requestAnimationFrame(layoutHand);
 }
 
 function renderHands(){
-  const hh = $('humanHand');
-  hh.innerHTML = '';
-  G.players.human.hand.forEach((c, i) => {
+  const hh = $('humanHand'); hh.innerHTML = '';
+  G.players.human.hand.forEach((c,i)=>{
     const el = makeCardEl(c, true);
     el.style.zIndex = i;
     if(G.selected.has(c.id)) el.classList.add('selected');
     hh.appendChild(el);
   });
-
-  const ch = $('cpuHand');
-  ch.innerHTML = '';
+  const ch = $('cpuHand'); ch.innerHTML = '';
   const botKey = G.mode === '4p' ? 'opp1' : 'cpu';
   const botP = G.players[botKey];
-  if(botP){
-    botP.hand.forEach((c, i) => {
-      const el = document.createElement('div');
-      el.className = 'card back';
-      el.style.zIndex = i;
-      ch.appendChild(el);
-    });
-  }
+  if(botP) botP.hand.forEach((c,i)=>{
+    const el = document.createElement('div');
+    el.className = 'card back';
+    el.style.zIndex = i;
+    ch.appendChild(el);
+  });
 }
 
 function renderMelds(){
-  const build = (who, containerId) => {
+  const build = (who, id) => {
     const p = G.players[who];
     if(!p) return;
-    const cont = $(containerId);
-    cont.innerHTML = '';
+    const cont = $(id); cont.innerHTML = '';
     for(const meld of p.melds){
       const wrap = document.createElement('div');
       wrap.className = 'meld' + (meld.canasta ? ' canasta' : '');
       const cs = document.createElement('div');
       cs.className = 'meld-cards';
-      meld.cards.forEach((c, i) => {
+      meld.cards.forEach((c,i)=>{
         const el = makeCardEl(c, false);
         el.style.zIndex = i;
         cs.appendChild(el);
@@ -1440,28 +1389,27 @@ function renderMelds(){
       cont.appendChild(wrap);
     }
   };
-  build('cpu', 'cpuMelds');
-  build('human', 'humanMelds');
+  build('cpu','cpuMelds');
+  build('human','humanMelds');
 }
 
 function renderPiles(){
-  const dEl = $('discardPile');
-  dEl.innerHTML = '';
+  const dEl = $('discardPile'); dEl.innerHTML = '';
   if(G.discard.length){
-    const top = G.discard[G.discard.length - 1];
+    const top = G.discard[G.discard.length-1];
     dEl.appendChild(makeCardEl(top, false));
     if(G.discard.length > 1){
-      const badge = document.createElement('div');
-      badge.className = 'pile-count';
-      badge.textContent = G.discard.length;
-      dEl.appendChild(badge);
+      const b = document.createElement('div');
+      b.className = 'pile-count';
+      b.textContent = G.discard.length;
+      dEl.appendChild(b);
     }
     const p = G.players.human;
     dEl.classList.toggle('disabled', !(isHumanTurn() && G.phase === 'draw' && canTakeDiscard(p)));
   } else {
-    const slot = document.createElement('div');
-    slot.className = 'empty-slot';
-    dEl.appendChild(slot);
+    const s = document.createElement('div');
+    s.className = 'empty-slot';
+    dEl.appendChild(s);
     dEl.classList.add('disabled');
   }
   $('stockCount').textContent = G.stock.length;
@@ -1475,32 +1423,29 @@ function updateStatus(){
 
   if(G.phase === 'end'){ el.textContent = 'Fim da rodada'; return; }
   if(!isHumanTurn()){
-    const current = G.turnOrder[G.turnIndex];
-    el.textContent = getPlayerName(G.players[current]) + ' pensando...';
+    const cur = G.turnOrder[G.turnIndex];
+    el.textContent = getPlayerName(G.players[cur]) + ' pensando...';
     el.classList.add('warn');
     return;
   }
   if(G.phase === 'draw'){
-    if(canTakeDiscard(p)){ el.textContent = 'Compre do monte ou pegue o lixo!'; el.classList.add('good'); }
-    else if(!G.stock.length){ el.textContent = 'Monte vazio — encerrando rodada...'; el.classList.add('warn'); }
-    else el.textContent = 'Sua vez — compre 2 cartas';
+    if(canTakeDiscard(p)){ el.textContent = 'Compre ou pegue o lixo!'; el.classList.add('good'); }
+    else if(!G.stock.length){ el.textContent = 'Monte vazio...'; el.classList.add('warn'); }
+    else el.textContent = 'Compre 2 cartas';
     return;
   }
   const sel = p.hand.filter(c => G.selected.has(c.id));
   if(sel.length){
     const v = validateMeld(p, sel);
-    if(v.ok){
-      const val = sel.reduce((s,c)=>s+c.value,0);
-      el.textContent = 'Sequência de ' + v.suit + ' • ' + val + ' pts';
-      el.classList.add('good');
-    } else { el.textContent = v.msg; el.classList.add('warn'); }
+    if(v.ok){ el.textContent = v.suit + ' • ' + sel.reduce((s,c)=>s+c.value,0) + ' pts'; el.classList.add('good'); }
+    else { el.textContent = v.msg; el.classList.add('warn'); }
   } else {
-    const hasCanastraLimpa = p.melds.some(m => m.canastra && m.wildCount === 0);
-    const mortoPego = G.mortoTaken[p.team];
-    if(hasCanastraLimpa && mortoPego){ el.textContent = '✓ Pronto para bater!'; el.classList.add('good'); }
-    else if(hasCanastraLimpa) el.textContent = 'Falta o MORTO para bater!';
-    else if(mortoPego) el.textContent = 'Falta CANASTRA LIMPA para bater!';
-    else el.textContent = 'Selecione cartas para melar ou 1 para descartar';
+    const cl = p.melds.some(m => m.canastra && m.wildCount === 0);
+    const mp = G.mortoTaken[p.team];
+    if(cl && mp){ el.textContent = '✓ Pronto para bater!'; el.classList.add('good'); }
+    else if(cl) el.textContent = 'Falta o MORTO!';
+    else if(mp) el.textContent = 'Falta CANASTRA LIMPA!';
+    else el.textContent = 'Selecione cartas ou descarte 1';
   }
 }
 
@@ -1511,10 +1456,8 @@ function updateButtons(){
   $('btnDraw').disabled = !(myTurn && G.phase === 'draw' && G.stock.length > 0);
   $('btnTake').disabled = !(myTurn && G.phase === 'draw' && canTakeDiscard(p));
   $('btnTake').classList.toggle('pulse', !$('btnTake').disabled);
-
   const sel = p.hand.filter(c => G.selected.has(c.id));
-  const canMeldNow = myTurn && G.phase === 'action' && sel.length > 0 && validateMeld(p, sel).ok;
-  $('btnMeld').disabled = !canMeldNow;
+  $('btnMeld').disabled = !(myTurn && G.phase === 'action' && sel.length > 0 && validateMeld(p, sel).ok);
   $('btnDiscard').disabled = !(myTurn && G.phase === 'action' && sel.length === 1);
 }
 
@@ -1533,19 +1476,13 @@ function layoutHand(){
   el.style.setProperty('--ov', ov + 'px');
 }
 
-/* =====================================================
-   WATCHDOG — recupera de travamentos
-===================================================== */
+/* Watchdog */
 setInterval(() => {
-  if(!G || G.phase === 'end' || !G.busy) return;
-  if(!G.busySince) return;
-  const elapsed = Date.now() - G.busySince;
-  if(elapsed > 6000){
-    console.warn('[Canastra Watchdog] Estado travado há ' + elapsed + 'ms — recuperando');
-    setBusy(false);
-    render();
+  if(!G || G.phase === 'end' || !G.busy || !G.busySince) return;
+  if(Date.now() - G.busySince > 6000){
+    console.warn('[Watchdog] Recuperando');
+    setBusy(false); render();
     if(!isHumanTurn() && G.phase !== 'end'){
-      const current = G.turnOrder[G.turnIndex];
       try { endTurn(); } catch(e){ console.error(e); }
     }
   }
@@ -1570,14 +1507,14 @@ function showGame(){
    EVENTOS
 ===================================================== */
 $('btnPlayOpen').addEventListener('click', () => {
-  tryLockOrientation();
+  tryLockOrientation(true);
   gameMode = '2p';
   newGame('2p');
   showGame();
   document.getElementById('oppLabel').textContent = 'CPU';
 });
 $('btnPlay4p').addEventListener('click', () => {
-  tryLockOrientation();
+  tryLockOrientation(true);
   gameMode = '4p';
   newGame('4p');
   showGame();
@@ -1609,13 +1546,11 @@ $('btnCloseStats').addEventListener('click', () => {
   $('menuScreen').classList.add('show');
 });
 $('btnResetStats').addEventListener('click', () => {
-  if(confirm('Resetar todas as estatísticas?')){
+  if(confirm('Resetar estatísticas?')){
     stats = { wins:0, losses:0, canastas:0, games:0 };
     saveStats();
-    $('statWins').textContent = 0;
-    $('statLosses').textContent = 0;
-    $('statCanastas').textContent = 0;
-    $('statGames').textContent = 0;
+    $('statWins').textContent = 0; $('statLosses').textContent = 0;
+    $('statCanastas').textContent = 0; $('statGames').textContent = 0;
   }
 });
 
@@ -1631,7 +1566,7 @@ $('discardPile').addEventListener('click', () => {
 });
 $('modalBtn').addEventListener('click', closeModal);
 $('btnMenu').addEventListener('click', () => {
-  if(confirm('Voltar ao menu principal? O progresso será perdido.')) showMenu();
+  if(confirm('Voltar ao menu? Progresso perdido.')) showMenu();
 });
 $('btnSound').addEventListener('click', () => {
   muted = !muted;
@@ -1641,9 +1576,9 @@ $('btnSound').addEventListener('click', () => {
   if(!muted) beep(660, 0.08);
 });
 
-window.addEventListener('resize', () => requestAnimationFrame(layoutHand));
+window.addEventListener('resize', () => { requestAnimationFrame(layoutHand); updateLandscapeMode(); });
 window.addEventListener('orientationchange', () => {
-  setTimeout(() => { layoutHand(); if(G) render(); }, 250);
+  setTimeout(() => { updateLandscapeMode(); layoutHand(); if(G) render(); }, 250);
 });
 
 document.addEventListener('keydown', e => {
@@ -1669,7 +1604,7 @@ newGame = function(mode){
   document.querySelector('#cpuBox .label').textContent = is4p ? 'Oponente' : 'CPU';
 };
 
-console.log('[Canastra_MS] Pronto. Plataforma:', IS_MOBILE ? 'MOBILE' : 'DESKTOP');
+console.log('[Canastra_MS] OK. Mobile:', IS_MOBILE, '| Landscape-mode:', document.documentElement.classList.contains('landscape-mode'));
 </script>
 </body>
 </html>
